@@ -1,0 +1,39 @@
+﻿using System.Collections.Generic;
+using mgtest.Interfaces;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace mgtest.Entities;
+
+public class Entity {
+  private readonly List<IComponent> _components = new();
+
+  public Vector2 Position;
+  public float Rotation;
+  public Vector2 Scale = Vector2.One;
+
+  public void AddComponent(IComponent component) {
+    _components.Add(component);
+  }
+
+  public T GetComponent<T>() where T : class, IComponent {
+    foreach (var comp in _components) {
+      if (comp is T casted)
+        return casted;
+    }
+
+    return null;
+  }
+
+  public void Update(GameTime gameTime) {
+    foreach (var comp in _components) {
+      comp.Update(gameTime);
+    }
+  }
+
+  public void Draw(SpriteBatch spriteBatch) {
+    foreach (var comp in _components) {
+      comp.Draw(spriteBatch);
+    }
+  }
+}
