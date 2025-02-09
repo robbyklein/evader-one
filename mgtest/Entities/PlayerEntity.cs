@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace mgtest.Entities;
 
 public class PlayerEntity : Entity {
-  // Configuration
+  // Configuration for animations
   private readonly Dictionary<CharacterAnimationType, AnimationDefinition> _animations = new() {
     [CharacterAnimationType.Idle] = new AnimationDefinition {
       Row = 14,
@@ -32,22 +32,19 @@ public class PlayerEntity : Entity {
   };
 
   public PlayerEntity(ContentManager content, TilemapManager tilemapManager) {
-    // start location
+    // Starting location
     Position = new Vector2(100.5f, 100.5f);
 
-    // Initialize SpriteSheet
+    // Initialize the sprite sheet
     var spriteSheet = new SpriteSheet {
       Rows = 48,
       Columns = 14,
       Texture = content.Load<Texture2D>("sprites/player")
     };
 
-    // Initialize Components
-    var physicsComponent = new Physics(
-      this, tilemapManager.GroundTiles,
-      tilemapManager.TiledMap.TileWidth,
-      tilemapManager.TiledMap.TileHeight
-    );
+    // Initialize Components:
+    // Use collision rectangles from the TilemapManager (loaded from the "Colliders" object layer in Tiled)
+    var physicsComponent = new Physics(this, tilemapManager.CollisionRectangles);
     AddComponent(physicsComponent);
 
     var possessedComponent = new PlayerPossessed(this);

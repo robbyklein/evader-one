@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using MonoGame.Extended;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 
@@ -17,36 +19,39 @@ public class TilemapManager {
   };
 
   private readonly Game _game;
-  public HashSet<Point> GroundTiles;
   public TiledMap TiledMap;
   public TiledMapRenderer TiledMapRenderer;
+
+  // New: List of collision rectangles loaded from an object layer
+  public List<RectangleF> CollisionRectangles { get; private set; }
 
   public TilemapManager(Game game) {
     _game = game;
   }
 
   public void LoadMap(Map map) {
-    GroundTiles = new HashSet<Point>();
-
-    var assetName = MapAssetNames.TryGetValue(map, out var name) ? name : "levels/unknown";
+    string assetName = MapAssetNames.TryGetValue(map, out string name) ? name : "levels/unknown";
     TiledMap = _game.Content.Load<TiledMap>(assetName);
     TiledMapRenderer = new TiledMapRenderer(_game.GraphicsDevice, TiledMap);
 
-    // Process tile properties
-    foreach (var layer in TiledMap.TileLayers) {
-      for (var y = 0; y < layer.Height; y++) {
-        for (var x = 0; x < layer.Width; x++) {
-          var tile = layer.GetTile((ushort)x, (ushort)y);
-          var globalTileId = tile.GlobalIdentifier & 0x3FFFFFFF;
-          MapTileProperties(globalTileId, x, y);
+    // Load collision objects from the "Colliders" object layer
+    CollisionRectangles = new List<RectangleF>();
+    var collisionLayer = TiledMap.GetLayer<TiledMapObjectLayer>("Collision");
+    if (collisionLayer != null) {
+      foreach (TiledMapObject obj in collisionLayer.Objects) {
+        Console.WriteLine(obj.Properties);
+        // Only add objects that have the tag "solid"
+        if (obj.Properties.ContainsKey("tag") && obj.Properties["tag"].ToString() == "solid") {
+          var rect = new RectangleF(obj.Position.X, obj.Position.Y, obj.Size.Width, obj.Size.Height);
+          CollisionRectangles.Add(rect);
         }
       }
     }
   }
 
   public void UnloadMap() {
-    GroundTiles?.Clear();
-    GroundTiles = null;
+    CollisionRectangles?.Clear();
+    CollisionRectangles = null;
 
     TiledMapRenderer?.Dispose();
     TiledMapRenderer = null;
@@ -55,33 +60,10 @@ public class TilemapManager {
   }
 
   public void Update(GameTime gameTime) {
-    if (TiledMapRenderer != null) {
-      TiledMapRenderer.Update(gameTime);
-    }
+    TiledMapRenderer?.Update(gameTime);
   }
 
   public void Draw() {
-    if (TiledMapRenderer != null) {
-      TiledMapRenderer.Draw();
-    }
-  }
-
-  private void MapTileProperties(int globalTileId, int x, int y) {
-    if (TiledMap == null) {
-      return;
-    }
-
-    var tileset = TiledMap.GetTilesetByTileGlobalIdentifier(globalTileId);
-    if (tileset == null) {
-      return;
-    }
-
-    var firstGid = TiledMap.GetTilesetFirstGlobalIdentifier(tileset);
-    var localTileId = globalTileId - firstGid;
-
-    var tileData = tileset.Tiles.Find(t => t.LocalTileIdentifier == localTileId);
-    if (tileData?.Properties != null && tileData.Properties.TryGetValue("ground", out var value) && value == "true") {
-      GroundTiles.Add(new Point(x, y));
-    }
+    TiledMapRenderer?.Draw();
   }
 }

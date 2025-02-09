@@ -74,7 +74,7 @@
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Underground.tsx"
     ],
     "project": "tiled.tiled-project",
-    "property.type": "bool",
+    "property.type": "string",
     "recentFiles": [
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Underground.tsx",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Tileset.tsx",
