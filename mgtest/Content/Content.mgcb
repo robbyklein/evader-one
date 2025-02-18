@@ -31,6 +31,12 @@
 /processor:TiledMapProcessor
 /build:levels/splash.tmx
 
+#begin music/one.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:music/one.mp3
+
 #begin numbers/0.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -150,6 +156,42 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:numbers/9.png
+
+#begin sfx/coin.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/coin.wav
+
+#begin sfx/explosion.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/explosion.wav
+
+#begin sfx/hurt.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/hurt.wav
+
+#begin sfx/jump.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/jump.wav
+
+#begin sfx/power_up.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/power_up.wav
+
+#begin sfx/tap.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/tap.wav
 
 #begin sprites/player.png
 /importer:TextureImporter

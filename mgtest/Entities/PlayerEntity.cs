@@ -33,7 +33,7 @@ public class PlayerEntity : Entity {
 
   public PlayerEntity(ContentManager content, TilemapManager tilemapManager) {
     // Starting location
-    Position = new Vector2(100.5f, 100.5f);
+    Position = new Vector2(50f, 20f);
 
     // Initialize the sprite sheet
     var spriteSheet = new SpriteSheet {
@@ -44,7 +44,7 @@ public class PlayerEntity : Entity {
 
     // Initialize Components:
     // Use collision rectangles from the TilemapManager (loaded from the "Colliders" object layer in Tiled)
-    var physicsComponent = new Physics(this, tilemapManager.CollisionRectangles);
+    var physicsComponent = new Physics(this, tilemapManager.CollisionRectangles, tilemapManager.WaterRectangles);
     AddComponent(physicsComponent);
 
     var possessedComponent = new PlayerPossessed(this);

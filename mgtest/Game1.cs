@@ -1,6 +1,5 @@
 ﻿using System;
 using mgtest.Config;
-using mgtest.Entities;
 using mgtest.Managers;
 using mgtest.Scenes;
 using mgtest.Utilities;
@@ -16,8 +15,6 @@ public class Game1 : Game {
   private ScreenScaler _screenScaler;
   private SpriteBatch _spriteBatch;
   private WindowManager _windowManager;
-  public FpsDisplay FpsDisplay;
-  public FpsManager FpsManager;
   public SceneManager SceneManager;
   public TilemapManager TilemapManager;
 
@@ -42,8 +39,6 @@ public class Game1 : Game {
     _windowManager = new WindowManager(Window, _graphics);
     SceneManager = new SceneManager(new Playground(this));
     TilemapManager = new TilemapManager(this);
-    FpsManager = new FpsManager();
-    FpsDisplay = new FpsDisplay(this);
     _renderTarget = new RenderTarget2D(GraphicsDevice, Settings.VirtualWidth, Settings.VirtualHeight);
 
     base.Initialize();
@@ -54,8 +49,8 @@ public class Game1 : Game {
     // Base
     _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-    // Global content
-    FpsDisplay.Load();
+    // Globals
+    SfxManager.LoadSounds(this);
 
     // Scene content
     SceneManager.LoadContent();
@@ -66,10 +61,6 @@ public class Game1 : Game {
     if (Keyboard.GetState().IsKeyDown(Keys.Escape)) {
       Exit();
     }
-
-    // Global updates
-    FpsManager.Update(gameTime);
-    FpsDisplay.Update(gameTime);
 
     //Scene updates
     SceneManager.Update(gameTime);
@@ -82,10 +73,7 @@ public class Game1 : Game {
     GraphicsDevice.SetRenderTarget(_renderTarget);
     GraphicsDevice.Clear(Color.Black);
 
-    _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
-    FpsDisplay.Draw(_spriteBatch);
     SceneManager.Draw(_spriteBatch);
-    _spriteBatch.End();
 
     // Switch back to the screen
     GraphicsDevice.SetRenderTarget(null);

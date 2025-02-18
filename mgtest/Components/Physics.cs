@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using mgtest.Entities;
 using mgtest.Interfaces;
+using mgtest.Types;
+using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -9,14 +11,19 @@ using MonoGame.Extended;
 namespace mgtest.Components;
 
 public class Physics : IComponent {
+  // Normal gravity vs. water gravity
+  private readonly float _gravityNormal = 300f;
+  private readonly float _gravityWater = 100f;
+  private float _currentGravity;
+
   private readonly float _friction = 0.9f;
-  private readonly float _gravity = 400f;
-  private readonly float _jumpForce = 200f;
+  private readonly float _jumpForce = 100f;
   private readonly float _maxSpeed = 400f;
   private readonly float _moveSpeed = 400f;
 
   private readonly Entity _owner;
   private readonly List<RectangleF> _collisionRects;
+  private readonly List<RectangleF> _waterRects;
 
   private bool _jumpRequested;
   private Vector2 _velocity;
@@ -27,13 +34,22 @@ public class Physics : IComponent {
   public bool IsFacingRight = true;
   public bool IsGrounded { get; private set; }
 
-  public Physics(Entity owner, List<RectangleF> collisionRects) {
+  public Physics(Entity owner, List<RectangleF> collisionRects, List<RectangleF> waterRects) {
     _owner = owner;
     _collisionRects = collisionRects;
+    _waterRects = waterRects;
   }
 
   public void Update(GameTime gameTime) {
     var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+    // 1) Determine if player is in water
+    bool isInWater = IsInWater();
+
+    // 2) Choose the correct gravity
+    _currentGravity = isInWater ? _gravityWater : _gravityNormal;
+
+    // 3) Horizontal movement
     _velocity.X += MoveInputX * _moveSpeed * dt;
     _velocity.X = MathHelper.Clamp(_velocity.X, -_maxSpeed, _maxSpeed);
 
@@ -49,17 +65,21 @@ public class Physics : IComponent {
       _velocity.X = 0f;
     }
 
+    // 4) Apply gravity
     if (!IsGrounded) {
-      _velocity.Y += _gravity * dt;
+      _velocity.Y += _currentGravity * dt;
     }
 
+    // 5) Jump logic
     if (IsGrounded && _jumpRequested) {
       _velocity.Y = -_jumpForce;
       IsGrounded = false;
+      SfxManager.PlaySound(Sfx.Jump);
     }
 
     _jumpRequested = false;
 
+    // 6) Move
     MoveX(_velocity.X * dt);
     MoveY(_velocity.Y * dt);
 
@@ -116,9 +136,11 @@ public class Physics : IComponent {
   }
 
   private bool IsColliding(Vector2 newPosition) {
-    const int playerWidth = 8;
+    const int playerWidth = 4;
     const int playerHeight = 8;
-    var playerRect = new RectangleF(newPosition.X, newPosition.Y, playerWidth, playerHeight);
+    var playerRect = new RectangleF(newPosition.X + 2, newPosition.Y, playerWidth, playerHeight);
+
+    // Check collision with "solid" rectangles only
     foreach (RectangleF rect in _collisionRects) {
       if (playerRect.Intersects(rect)) {
         return true;
@@ -129,15 +151,32 @@ public class Physics : IComponent {
   }
 
   private void CheckIfGrounded() {
-    const int playerWidth = 8;
+    const int playerWidth = 6;
     const int playerHeight = 8;
     var playerRect = new RectangleF(_owner.Position.X, _owner.Position.Y + 1, playerWidth, playerHeight);
     IsGrounded = false;
+
     foreach (RectangleF rect in _collisionRects) {
       if (playerRect.Intersects(rect)) {
         IsGrounded = true;
         break;
       }
     }
+  }
+
+  private bool IsInWater() {
+    // Check if player's rectangle intersects any water rect.
+    // Use roughly the same rectangle as for collision
+    const int playerWidth = 4;
+    const int playerHeight = 8;
+    var playerRect = new RectangleF(_owner.Position.X + 2, _owner.Position.Y, playerWidth, playerHeight);
+
+    foreach (RectangleF waterRect in _waterRects) {
+      if (playerRect.Intersects(waterRect)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
