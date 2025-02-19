@@ -10,34 +10,60 @@ using MonoGame.Extended;
 
 namespace mgtest.Components;
 
+public struct PhysicsSize {
+  public int Width;
+  public int Height;
+  public int OffsetX;
+  public int OffsetY;
+
+  public PhysicsSize(int width = 8, int height = 8, int offsetX = 0, int offsetY = 0) {
+    Width = width;
+    Height = height;
+    OffsetX = offsetX;
+    OffsetY = offsetY;
+  }
+}
+
 public class Physics : IComponent {
-  // Normal gravity vs. water gravity
+  // Settings
   private readonly float _gravityNormal = 300f;
   private readonly float _gravityWater = 100f;
-  private float _currentGravity;
-
   private readonly float _friction = 0.9f;
   private readonly float _jumpForce = 100f;
   private readonly float _maxSpeed = 400f;
   private readonly float _moveSpeed = 400f;
+  private readonly PhysicsSize _physicsSize;
 
+  // Dependencies
   private readonly Entity _owner;
+  private readonly SfxManager _sfxManager;
   private readonly List<RectangleF> _collisionRects;
   private readonly List<RectangleF> _waterRects;
 
+  // State
+  private float _currentGravity;
   private bool _jumpRequested;
   private Vector2 _velocity;
   private float _xRemainder;
   private float _yRemainder;
 
+  // External inputs/flags
   public float MoveInputX = 0f;
   public bool IsFacingRight = true;
   public bool IsGrounded { get; private set; }
 
-  public Physics(Entity owner, List<RectangleF> collisionRects, List<RectangleF> waterRects) {
+  // Constructor
+  public Physics(
+    Entity owner,
+    PhysicsSize physicsSize,
+    SfxManager sfxManager,
+    List<RectangleF> collisionRects,
+    List<RectangleF> waterRects) {
     _owner = owner;
+    _physicsSize = physicsSize;
     _collisionRects = collisionRects;
     _waterRects = waterRects;
+    _sfxManager = sfxManager;
   }
 
   public void Update(GameTime gameTime) {
@@ -60,12 +86,13 @@ public class Physics : IComponent {
       IsFacingRight = false;
     }
 
+    // Apply friction
     _velocity.X *= _friction;
     if (Math.Abs(_velocity.X) < 0.1f) {
       _velocity.X = 0f;
     }
 
-    // 4) Apply gravity
+    // 4) Apply gravity (if not grounded)
     if (!IsGrounded) {
       _velocity.Y += _currentGravity * dt;
     }
@@ -74,7 +101,7 @@ public class Physics : IComponent {
     if (IsGrounded && _jumpRequested) {
       _velocity.Y = -_jumpForce;
       IsGrounded = false;
-      SfxManager.PlaySound(Sfx.Jump);
+      _sfxManager.PlaySound(Sfx.Jump);
     }
 
     _jumpRequested = false;
@@ -83,12 +110,15 @@ public class Physics : IComponent {
     MoveX(_velocity.X * dt);
     MoveY(_velocity.Y * dt);
 
+    // 7) Check grounded
     CheckIfGrounded();
   }
 
   public void Draw(SpriteBatch spriteBatch) {
+    // No drawing in the physics component
   }
 
+  // Request a jump from external code (e.g., input handling)
   public void RequestJump() {
     _jumpRequested = true;
   }
@@ -121,6 +151,7 @@ public class Physics : IComponent {
       while (move != 0) {
         var nextPos = new Vector2(_owner.Position.X, _owner.Position.Y + sign);
         if (IsColliding(nextPos)) {
+          // If we hit something while moving down, we are grounded
           if (sign > 0) {
             IsGrounded = true;
           }
@@ -136,11 +167,13 @@ public class Physics : IComponent {
   }
 
   private bool IsColliding(Vector2 newPosition) {
-    const int playerWidth = 4;
-    const int playerHeight = 8;
-    var playerRect = new RectangleF(newPosition.X + 2, newPosition.Y, playerWidth, playerHeight);
+    var playerRect = new RectangleF(
+      newPosition.X + _physicsSize.OffsetX,
+      newPosition.Y + _physicsSize.OffsetY,
+      _physicsSize.Width,
+      _physicsSize.Height
+    );
 
-    // Check collision with "solid" rectangles only
     foreach (RectangleF rect in _collisionRects) {
       if (playerRect.Intersects(rect)) {
         return true;
@@ -151,11 +184,14 @@ public class Physics : IComponent {
   }
 
   private void CheckIfGrounded() {
-    const int playerWidth = 6;
-    const int playerHeight = 8;
-    var playerRect = new RectangleF(_owner.Position.X, _owner.Position.Y + 1, playerWidth, playerHeight);
-    IsGrounded = false;
+    var playerRect = new RectangleF(
+      _owner.Position.X + _physicsSize.OffsetX,
+      _owner.Position.Y + _physicsSize.OffsetY + 1, // +1 for ground check
+      _physicsSize.Width,
+      _physicsSize.Height
+    );
 
+    IsGrounded = false;
     foreach (RectangleF rect in _collisionRects) {
       if (playerRect.Intersects(rect)) {
         IsGrounded = true;
@@ -165,11 +201,12 @@ public class Physics : IComponent {
   }
 
   private bool IsInWater() {
-    // Check if player's rectangle intersects any water rect.
-    // Use roughly the same rectangle as for collision
-    const int playerWidth = 4;
-    const int playerHeight = 8;
-    var playerRect = new RectangleF(_owner.Position.X + 2, _owner.Position.Y, playerWidth, playerHeight);
+    var playerRect = new RectangleF(
+      _owner.Position.X + _physicsSize.OffsetX,
+      _owner.Position.Y + _physicsSize.OffsetY,
+      _physicsSize.Width,
+      _physicsSize.Height
+    );
 
     foreach (RectangleF waterRect in _waterRects) {
       if (playerRect.Intersects(waterRect)) {

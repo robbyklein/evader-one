@@ -2,6 +2,7 @@
 using mgtest.Components;
 using mgtest.Managers;
 using mgtest.Types;
+using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -31,11 +32,12 @@ public class PlayerEntity : Entity {
     }
   };
 
-  public PlayerEntity(ContentManager content, TilemapManager tilemapManager) {
-    // Starting location
+  // Configuration for colliders
+  private readonly PhysicsSize _physicsSize = new(4, 8, 2);
+
+  public PlayerEntity(ContentManager content, TilemapManager tilemapManager, SfxManager sfxManager) {
     Position = new Vector2(50f, 20f);
 
-    // Initialize the sprite sheet
     var spriteSheet = new SpriteSheet {
       Rows = 48,
       Columns = 14,
@@ -43,8 +45,8 @@ public class PlayerEntity : Entity {
     };
 
     // Initialize Components:
-    // Use collision rectangles from the TilemapManager (loaded from the "Colliders" object layer in Tiled)
-    var physicsComponent = new Physics(this, tilemapManager.CollisionRectangles, tilemapManager.WaterRectangles);
+    var physicsComponent =
+      new Physics(this, _physicsSize, sfxManager, tilemapManager.CollisionRectangles, tilemapManager.WaterRectangles);
     AddComponent(physicsComponent);
 
     var possessedComponent = new PlayerPossessed(this);

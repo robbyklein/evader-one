@@ -2,6 +2,7 @@
 using mgtest.Components;
 using mgtest.Entities;
 using mgtest.Managers;
+using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
@@ -12,45 +13,42 @@ public class Playground : Scene {
   private Song _musicPlayer;
   private Entity _playerEntity;
   private Camera _camera;
+  private TilemapManager _tilemapManager;
+  private readonly SfxManager _sfxManager;
 
   public Playground(Game1 game) : base(game) {
+    _tilemapManager = new TilemapManager(Game);
+    _sfxManager = new SfxManager();
+
+    MediaPlayer.IsRepeating = true;
   }
 
   public override void LoadContent() {
-    // Load the map
-    Game.TilemapManager.LoadMap(Map.Playground);
-
-    // Create your player
-    _playerEntity = new PlayerEntity(Game.Content, Game.TilemapManager);
-
-    // Create the camera
+    _sfxManager.LoadSounds(Game);
+    _tilemapManager.LoadMap(Map.Playground);
     _camera = new Camera(Game.GraphicsDevice);
-
-    // Music
     _musicPlayer = Game.Content.Load<Song>("music/one");
-    MediaPlayer.IsRepeating = true;
+    _playerEntity = new PlayerEntity(Game.Content, _tilemapManager, _sfxManager);
+
     MediaPlayer.Play(_musicPlayer);
   }
 
   public override void UnloadContent() {
     _playerEntity = null;
     _camera = null;
+    _tilemapManager = null;
+    _musicPlayer = null;
   }
 
   public override void Update(GameTime gameTime) {
-    Game.TilemapManager.Update(gameTime);
+    _tilemapManager.Update(gameTime);
     _playerEntity.Update(gameTime);
-
-    // Follow the player
-    _camera.Update(_playerEntity.Position, Game.TilemapManager.TiledMap);
+    _camera.Update(_playerEntity.Position, _tilemapManager.TiledMap);
   }
 
   public override void Draw(SpriteBatch spriteBatch) {
-    // 1) Draw the TiledMap with camera transform
-    //    The TiledMapRenderer has an overload that takes the matrix
-    Game.TilemapManager.TiledMapRenderer.Draw(_camera.Transform);
+    _tilemapManager.TiledMapRenderer.Draw(_camera.Transform);
 
-    // 2) Draw your entities with the same transform
     spriteBatch.Begin(transformMatrix: _camera.Transform);
     _playerEntity.Draw(spriteBatch);
     spriteBatch.End();

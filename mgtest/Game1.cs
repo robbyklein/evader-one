@@ -16,7 +16,6 @@ public class Game1 : Game {
   private SpriteBatch _spriteBatch;
   private WindowManager _windowManager;
   public SceneManager SceneManager;
-  public TilemapManager TilemapManager;
 
   public Game1() {
     // Settings & Configuration
@@ -34,11 +33,9 @@ public class Game1 : Game {
   }
 
   protected override void Initialize() {
-    // Initialize managers
     _screenScaler = new ScreenScaler(_graphics, Settings.VirtualWidth, Settings.VirtualHeight);
     _windowManager = new WindowManager(Window, _graphics);
     SceneManager = new SceneManager(new Playground(this));
-    TilemapManager = new TilemapManager(this);
     _renderTarget = new RenderTarget2D(GraphicsDevice, Settings.VirtualWidth, Settings.VirtualHeight);
 
     base.Initialize();
@@ -46,23 +43,15 @@ public class Game1 : Game {
 
 
   protected override void LoadContent() {
-    // Base
     _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-    // Globals
-    SfxManager.LoadSounds(this);
-
-    // Scene content
     SceneManager.LoadContent();
   }
 
   protected override void Update(GameTime gameTime) {
-    // Exit game
     if (Keyboard.GetState().IsKeyDown(Keys.Escape)) {
       Exit();
     }
 
-    //Scene updates
     SceneManager.Update(gameTime);
     base.Update(gameTime);
   }
@@ -84,7 +73,7 @@ public class Game1 : Game {
     var destinationRect = new Rectangle(scale.OffsetX, scale.OffsetY, scale.ScaledWidth, scale.ScaledHeight);
 
     _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
-    _spriteBatch.Draw(_renderTarget, destinationRect, Color.White); // No integer rounding here!
+    _spriteBatch.Draw(_renderTarget, destinationRect, Color.White);
     _spriteBatch.End();
 
     base.Draw(gameTime);
