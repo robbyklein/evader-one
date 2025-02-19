@@ -29,11 +29,17 @@ public class PlayerEntity : Entity {
       StartFrame = 0,
       EndFrame = 0,
       FrameTime = 100f
+    },
+    [CharacterAnimationType.WallSlide] = new AnimationDefinition {
+      Row = 12,
+      StartFrame = 0,
+      EndFrame = 0,
+      FrameTime = 100f
     }
   };
 
   // Configuration for colliders
-  private readonly PhysicsSize _physicsSize = new(4, 8, 2);
+  private readonly PhysicsSize _physicsSize = new(6, 8, 1);
 
   public PlayerEntity(ContentManager content, TilemapManager tilemapManager, SfxManager sfxManager) {
     Position = new Vector2(50f, 20f);

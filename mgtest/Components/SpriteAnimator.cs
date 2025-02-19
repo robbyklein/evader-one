@@ -26,28 +26,30 @@ public class SpriteAnimator : IComponent {
     SpriteSheet spriteSheet,
     Dictionary<CharacterAnimationType, AnimationDefinition> animations
   ) {
-    // Initialize everything
     _owner = owner;
     _spriteSheet = spriteSheet;
     _physics = _owner.GetComponent<Physics>();
     _animations = animations;
 
-    // Set initial animation
+    // Start idle
     SetAnimation(CharacterAnimationType.Idle);
   }
 
   public void SetAnimation(CharacterAnimationType animType) {
-    // Ensure the animation exists in the dictionary
+    // Ensure it exists
     if (!_animations.TryGetValue(animType, out AnimationDefinition newAnimDef)) {
-      throw new KeyNotFoundException($"Animation type {animType} not found in _animations dictionary.");
+      throw new KeyNotFoundException(
+        $"Animation type {animType} not found in _animations dictionary."
+      );
     }
 
-    // If already set, still update `_currentAnimDef` to ensure it's not null
+    // If same as current, just update definition
     if (_currentAnimationType == animType) {
-      _currentAnimDef = newAnimDef; // This ensures `_currentAnimDef` is always set
+      _currentAnimDef = newAnimDef;
       return;
     }
 
+    // Otherwise switch animation
     _currentAnimationType = animType;
     _currentAnimDef = newAnimDef;
     _timer = 0f;
@@ -55,20 +57,18 @@ public class SpriteAnimator : IComponent {
   }
 
   public void Update(GameTime gameTime) {
-    // Update the timer
-    var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-    _timer += deltaTime;
+    var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+    _timer += dt;
 
-    // Update animation type 
+    // Figure out which animation we should be in
     CharacterAnimationType nextAnimation = GetNextAnimationType();
     if (nextAnimation != _currentAnimationType) {
       SetAnimation(nextAnimation);
     }
 
-    // Update the sprite
+    // Advance frames if enough time
     if (_timer >= _currentAnimDef.FrameTime) {
       _currentFrameCol++;
-
       if (_currentFrameCol > _currentAnimDef.EndFrame) {
         _currentFrameCol = _currentAnimDef.StartFrame;
       }
@@ -78,14 +78,22 @@ public class SpriteAnimator : IComponent {
   }
 
   public CharacterAnimationType GetNextAnimationType() {
-    if (_physics.MoveInputX != 0 && _physics.IsGrounded) {
-      return CharacterAnimationType.Walk;
+    // 1) If wall sliding, use that animation if it exists
+    if (_physics.IsWallSliding) {
+      return CharacterAnimationType.WallSlide;
     }
 
+    // 2) If airborne and not wall sliding
     if (!_physics.IsGrounded) {
       return CharacterAnimationType.Jump;
     }
 
+    // 3) If grounded + horizontal input
+    if (_physics.IsGrounded && _physics.MoveInputX != 0f) {
+      return CharacterAnimationType.Walk;
+    }
+
+    // 4) Otherwise idle
     return CharacterAnimationType.Idle;
   }
 
@@ -98,8 +106,21 @@ public class SpriteAnimator : IComponent {
       _spriteSheet.FrameHeight
     );
 
-    // Determine the sprite effect based on movement direction
-    SpriteEffects spriteEffect = _physics.IsFacingRight ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
+    // Default flipping logic based on facing
+    SpriteEffects spriteEffect = _physics.IsFacingRight
+      ? SpriteEffects.None
+      : SpriteEffects.FlipHorizontally;
+
+    // If you want the sprite to always face the wall while sliding,
+    // you could override the facing here. Example:
+    if (_physics.IsWallSliding) {
+      if (_physics.IsTouchingWallRight) {
+        spriteEffect = SpriteEffects.FlipHorizontally; // face left
+      }
+      else {
+        spriteEffect = SpriteEffects.None; // face right
+      }
+    }
 
     spriteBatch.Draw(
       _spriteSheet.Texture,
@@ -107,9 +128,9 @@ public class SpriteAnimator : IComponent {
       sourceRect,
       Color.White,
       _owner.Rotation,
-      Vector2.Zero, // Origin (top-left corner)
+      Vector2.Zero, // origin
       _owner.Scale,
-      spriteEffect, // Apply flipping effect
+      spriteEffect,
       0f
     );
   }

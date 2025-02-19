@@ -3,16 +3,17 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx",
+    "activeFile": "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Water.tsx",
     "expandedProjectPaths": [
-        "mgtest/Content/tilesets",
-        "C:/Users/hello/Developer/mgtest",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/levels",
         ".",
         "C:/Users/hello/Developer/mgtest/mgtest",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets",
-        "mgtest/Content",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content"
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/levels",
+        "C:/Users/hello/Developer/mgtest/mgtest/obj",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content",
+        "mgtest/Content/tilesets",
+        "C:/Users/hello/Developer/mgtest",
+        "mgtest/Content"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -21,11 +22,11 @@
             "scaleInEditor": 1
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx": {
-            "scale": 2,
+            "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 119.75,
-                "y": 72.25
+                "x": 149.16666666666666,
+                "y": 56.83333333333333
             }
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/splash.tmx": {
@@ -38,11 +39,11 @@
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Overworld.tsx": {
             "scaleInDock": 2,
-            "scaleInEditor": 1
+            "scaleInEditor": 3
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Tileset.tsx": {
             "scaleInDock": 3,
-            "scaleInEditor": 1
+            "scaleInEditor": 3
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Underground.tsx": {
             "scaleInDock": 4,
@@ -75,17 +76,20 @@
     "map.tileWidth": 16,
     "openFiles": [
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Water.tsx"
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Water.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Underground.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Overworld.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Tileset.tsx"
     ],
     "project": "tiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Water.tsx",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Underground.tsx",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Tileset.tsx",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/Underground.tsx",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Overworld.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Underground.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Water.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/Underground.tsx",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/splash.tmx",
         "mgtest/Content/levels/playground.tmx",
         "mgtest/Content/tilesets/Tileset.tsx"

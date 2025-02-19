@@ -12,7 +12,8 @@ public class AnimationDefinition {
 public enum CharacterAnimationType {
   Idle,
   Walk,
-  Jump
+  Jump,
+  WallSlide
 }
 
 public class SpriteSheet {
