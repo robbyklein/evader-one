@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using mgtest.Entities;
 using mgtest.Interfaces;
 using mgtest.Types;
@@ -36,8 +35,6 @@ public class SpriteAnimator : IComponent {
 
     // Start with a default animation
     SetAnimation(CharacterAnimationType.Idle);
-
-    Console.WriteLine("[SpriteAnimator] Created. Default animation set to 'Idle'.");
   }
 
   public void SetAnimation(CharacterAnimationType animType) {
@@ -53,16 +50,6 @@ public class SpriteAnimator : IComponent {
     _currentAnimDef = newAnimDef;
     _timer = 0f;
     _currentFrameIndex = _currentAnimDef.StartFrame;
-
-    Console.WriteLine(
-      $"[SpriteAnimator] SetAnimation -> " +
-      $"AnimType={animType}, " +
-      $"Row={_currentAnimDef.Row}, " +
-      $"StartFrame={_currentAnimDef.StartFrame}, " +
-      $"EndFrame={_currentAnimDef.EndFrame}, " +
-      $"FrameTime={_currentAnimDef.FrameTime}, " +
-      $"AnimateAcrossColumns={_currentAnimDef.AnimateAcrossColumns}"
-    );
   }
 
   public void Update(GameTime gameTime) {
@@ -74,16 +61,7 @@ public class SpriteAnimator : IComponent {
       ? _currentAnimationType
       : GetNextAnimationTypeFromPhysics();
 
-    // Log current state before changing animation or frames
-    Console.WriteLine(
-      $"[SpriteAnimator Update] dt={dt:F3}, " +
-      $"currentAnim={_currentAnimationType}, " +
-      $"currentFrameIndex={_currentFrameIndex}, " +
-      $"timer={_timer:F3}"
-    );
-
     if (nextAnimation != _currentAnimationType) {
-      Console.WriteLine($"[SpriteAnimator Update] Switching from {_currentAnimationType} to {nextAnimation}");
       SetAnimation(nextAnimation);
     }
 
@@ -98,11 +76,6 @@ public class SpriteAnimator : IComponent {
 
       // Reset timer
       _timer = 0f;
-
-      Console.WriteLine(
-        $"[SpriteAnimator Update] Frame advanced to {_currentFrameIndex}. " +
-        $"(Start={_currentAnimDef.StartFrame}, End={_currentAnimDef.EndFrame})"
-      );
     }
   }
 
@@ -162,11 +135,6 @@ public class SpriteAnimator : IComponent {
       }
     }
 
-    // Log what frame we are drawing
-    Console.WriteLine(
-      $"[SpriteAnimator Draw] Drawing at row={row}, col={col}, sourceRect={sourceRect} " +
-      $"for anim={_currentAnimationType}"
-    );
 
     // Draw the sprite
     spriteBatch.Draw(

@@ -49,7 +49,7 @@ public class PlayerEntity : Entity {
     var spriteSheet = new SpriteSheet {
       Rows = 48,
       Columns = 14,
-      Texture = content.Load<Texture2D>("sprites/player")
+      Texture = content.Load<Texture2D>("tilesets/player")
     };
 
     // Initialize Components:

@@ -27,7 +27,7 @@ public class CoinEntity : Entity {
     var spriteSheet = new SpriteSheet {
       Rows = 8,
       Columns = 10,
-      Texture = content.Load<Texture2D>("sprites/items")
+      Texture = content.Load<Texture2D>("tilesets/items")
     };
 
     // Create the coin's animation component.

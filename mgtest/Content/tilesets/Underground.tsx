@@ -1001,6 +1001,14 @@
    <property name="ground" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="647">
+  <animation>
+   <frame tileid="647" duration="200"/>
+   <frame tileid="621" duration="200"/>
+   <frame tileid="595" duration="200"/>
+   <frame tileid="621" duration="200"/>
+  </animation>
+ </tile>
  <tile id="650">
   <properties>
    <property name="ground" type="bool" value="true"/>
