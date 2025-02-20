@@ -12,6 +12,7 @@ namespace mgtest.Scenes;
 public class Playground : Scene {
   private Song _musicPlayer;
   private Entity _playerEntity;
+  private Entity _coinEntity;
   private Camera _camera;
   private TilemapManager _tilemapManager;
   private readonly SfxManager _sfxManager;
@@ -29,6 +30,7 @@ public class Playground : Scene {
     _camera = new Camera(Game.GraphicsDevice);
     _musicPlayer = Game.Content.Load<Song>("music/one");
     _playerEntity = new PlayerEntity(Game.Content, _tilemapManager, _sfxManager);
+    _coinEntity = new CoinEntity(Game.Content);
 
     MediaPlayer.Play(_musicPlayer);
   }
@@ -43,6 +45,7 @@ public class Playground : Scene {
   public override void Update(GameTime gameTime) {
     _tilemapManager.Update(gameTime);
     _playerEntity.Update(gameTime);
+    _coinEntity.Update(gameTime);
     _camera.Update(_playerEntity.Position, _tilemapManager.TiledMap);
   }
 
@@ -51,6 +54,7 @@ public class Playground : Scene {
 
     spriteBatch.Begin(transformMatrix: _camera.Transform);
     _playerEntity.Draw(spriteBatch);
+    _coinEntity.Draw(spriteBatch);
     spriteBatch.End();
   }
 }

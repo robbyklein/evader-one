@@ -11,28 +11,30 @@ public class Entity {
   public Vector2 Position;
   public float Rotation;
   public Vector2 Scale = Vector2.One;
+  public string Name;
 
   public void AddComponent(IComponent component) {
     _components.Add(component);
   }
 
   public T GetComponent<T>() where T : class, IComponent {
-    foreach (var comp in _components) {
-      if (comp is T casted)
+    foreach (IComponent comp in _components) {
+      if (comp is T casted) {
         return casted;
+      }
     }
 
     return null;
   }
 
   public void Update(GameTime gameTime) {
-    foreach (var comp in _components) {
+    foreach (IComponent comp in _components) {
       comp.Update(gameTime);
     }
   }
 
   public void Draw(SpriteBatch spriteBatch) {
-    foreach (var comp in _components) {
+    foreach (IComponent comp in _components) {
       comp.Draw(spriteBatch);
     }
   }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using mgtest.Entities;
 using mgtest.Interfaces;
 using mgtest.Types;
@@ -11,7 +12,7 @@ namespace mgtest.Components;
 public class SpriteAnimator : IComponent {
   // Dependencies
   private readonly Entity _owner;
-  private readonly Physics _physics;
+  private readonly Physics? _physics; // optional
   private readonly Dictionary<CharacterAnimationType, AnimationDefinition> _animations;
   private readonly SpriteSheet _spriteSheet;
 
@@ -19,7 +20,9 @@ public class SpriteAnimator : IComponent {
   private CharacterAnimationType _currentAnimationType;
   private AnimationDefinition _currentAnimDef;
   private float _timer;
-  private int _currentFrameCol;
+
+  // Our frame index, which might represent columns or rows depending on AnimateAcrossColumns
+  private int _currentFrameIndex;
 
   public SpriteAnimator(
     Entity owner,
@@ -28,100 +31,144 @@ public class SpriteAnimator : IComponent {
   ) {
     _owner = owner;
     _spriteSheet = spriteSheet;
-    _physics = _owner.GetComponent<Physics>();
+    _physics = _owner.GetComponent<Physics>(); // might be null
     _animations = animations;
 
-    // Start idle
+    // Start with a default animation
     SetAnimation(CharacterAnimationType.Idle);
+
+    Console.WriteLine("[SpriteAnimator] Created. Default animation set to 'Idle'.");
   }
 
   public void SetAnimation(CharacterAnimationType animType) {
-    // Ensure it exists
     if (!_animations.TryGetValue(animType, out AnimationDefinition newAnimDef)) {
       throw new KeyNotFoundException(
         $"Animation type {animType} not found in _animations dictionary."
       );
     }
 
-    // If same as current, just update definition
-    if (_currentAnimationType == animType) {
-      _currentAnimDef = newAnimDef;
-      return;
-    }
-
-    // Otherwise switch animation
+    // Always update the animation definition and reset frame state,
+    // even if the animation type is already the current one.
     _currentAnimationType = animType;
     _currentAnimDef = newAnimDef;
     _timer = 0f;
-    _currentFrameCol = _currentAnimDef.StartFrame;
+    _currentFrameIndex = _currentAnimDef.StartFrame;
+
+    Console.WriteLine(
+      $"[SpriteAnimator] SetAnimation -> " +
+      $"AnimType={animType}, " +
+      $"Row={_currentAnimDef.Row}, " +
+      $"StartFrame={_currentAnimDef.StartFrame}, " +
+      $"EndFrame={_currentAnimDef.EndFrame}, " +
+      $"FrameTime={_currentAnimDef.FrameTime}, " +
+      $"AnimateAcrossColumns={_currentAnimDef.AnimateAcrossColumns}"
+    );
   }
 
   public void Update(GameTime gameTime) {
     var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
     _timer += dt;
 
-    // Figure out which animation we should be in
-    CharacterAnimationType nextAnimation = GetNextAnimationType();
+    // If we have physics, figure out which animation to use
+    CharacterAnimationType nextAnimation = _physics == null
+      ? _currentAnimationType
+      : GetNextAnimationTypeFromPhysics();
+
+    // Log current state before changing animation or frames
+    Console.WriteLine(
+      $"[SpriteAnimator Update] dt={dt:F3}, " +
+      $"currentAnim={_currentAnimationType}, " +
+      $"currentFrameIndex={_currentFrameIndex}, " +
+      $"timer={_timer:F3}"
+    );
+
     if (nextAnimation != _currentAnimationType) {
+      Console.WriteLine($"[SpriteAnimator Update] Switching from {_currentAnimationType} to {nextAnimation}");
       SetAnimation(nextAnimation);
     }
 
-    // Advance frames if enough time
+    // Advance frames if enough time has passed
     if (_timer >= _currentAnimDef.FrameTime) {
-      _currentFrameCol++;
-      if (_currentFrameCol > _currentAnimDef.EndFrame) {
-        _currentFrameCol = _currentAnimDef.StartFrame;
+      // Increase frame index
+      _currentFrameIndex++;
+      // If we exceed EndFrame, wrap around
+      if (_currentFrameIndex > _currentAnimDef.EndFrame) {
+        _currentFrameIndex = _currentAnimDef.StartFrame;
       }
 
+      // Reset timer
       _timer = 0f;
+
+      Console.WriteLine(
+        $"[SpriteAnimator Update] Frame advanced to {_currentFrameIndex}. " +
+        $"(Start={_currentAnimDef.StartFrame}, End={_currentAnimDef.EndFrame})"
+      );
     }
   }
 
-  public CharacterAnimationType GetNextAnimationType() {
-    // 1) If wall sliding, use that animation if it exists
+  private CharacterAnimationType GetNextAnimationTypeFromPhysics() {
+    if (_physics == null) {
+      return _currentAnimationType;
+    }
+
     if (_physics.IsWallSliding) {
       return CharacterAnimationType.WallSlide;
     }
 
-    // 2) If airborne and not wall sliding
     if (!_physics.IsGrounded) {
       return CharacterAnimationType.Jump;
     }
 
-    // 3) If grounded + horizontal input
     if (_physics.IsGrounded && _physics.MoveInputX != 0f) {
       return CharacterAnimationType.Walk;
     }
 
-    // 4) Otherwise idle
     return CharacterAnimationType.Idle;
   }
 
   public void Draw(SpriteBatch spriteBatch) {
-    int row = _currentAnimDef.Row;
+    // Figure out row & column from AnimateAcrossColumns
+    int row, col;
+    if (_currentAnimDef.AnimateAcrossColumns) {
+      // Animate horizontally
+      row = _currentAnimDef.Row;
+      col = _currentFrameIndex;
+    }
+    else {
+      // Animate vertically
+      col = _currentAnimDef.Row;
+      row = _currentFrameIndex;
+    }
+
     var sourceRect = new Rectangle(
-      _currentFrameCol * _spriteSheet.FrameWidth,
+      col * _spriteSheet.FrameWidth,
       row * _spriteSheet.FrameHeight,
       _spriteSheet.FrameWidth,
       _spriteSheet.FrameHeight
     );
 
-    // Default flipping logic based on facing
-    SpriteEffects spriteEffect = _physics.IsFacingRight
-      ? SpriteEffects.None
-      : SpriteEffects.FlipHorizontally;
+    // Default flipping logic
+    var spriteEffect = SpriteEffects.None;
+    if (_physics != null) {
+      spriteEffect = _physics.IsFacingRight
+        ? SpriteEffects.None
+        : SpriteEffects.FlipHorizontally;
 
-    // If you want the sprite to always face the wall while sliding,
-    // you could override the facing here. Example:
-    if (_physics.IsWallSliding) {
-      if (_physics.IsTouchingWallRight) {
-        spriteEffect = SpriteEffects.FlipHorizontally; // face left
-      }
-      else {
-        spriteEffect = SpriteEffects.None; // face right
+      // If we want the sprite to always face the wall while sliding
+      if (_physics.IsWallSliding) {
+        spriteEffect = _physics.IsTouchingWallRight
+          ? SpriteEffects.FlipHorizontally
+          : SpriteEffects.None;
       }
     }
 
+    // Log what frame we are drawing
+    Console.WriteLine(
+      $"[SpriteAnimator Draw] Drawing at row={row}, col={col}, sourceRect={sourceRect} " +
+      $"for anim={_currentAnimationType}"
+    );
+
+    // Draw the sprite
     spriteBatch.Draw(
       _spriteSheet.Texture,
       _owner.Position,

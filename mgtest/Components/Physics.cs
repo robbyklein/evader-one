@@ -140,6 +140,7 @@ public class Physics : IComponent {
     if (_jumpRequested) {
       if (IsGrounded) {
         _velocity.Y = -_jumpForce;
+        _sfxManager.PlaySound(Sfx.Jump);
       }
       else if (IsTouchingWallLeft || IsTouchingWallRight) {
         WallJump();

@@ -10,6 +10,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace mgtest.Entities;
 
 public class PlayerEntity : Entity {
+  public string Name = "Player";
+
   // Configuration for animations
   private readonly Dictionary<CharacterAnimationType, AnimationDefinition> _animations = new() {
     [CharacterAnimationType.Idle] = new AnimationDefinition {

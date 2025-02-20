@@ -7,6 +7,8 @@ public class AnimationDefinition {
   public int StartFrame { get; set; }
   public int EndFrame { get; set; }
   public float FrameTime { get; set; }
+
+  public bool AnimateAcrossColumns { get; set; } = true;
 }
 
 public enum CharacterAnimationType {
