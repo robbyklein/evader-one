@@ -12,16 +12,15 @@ public enum Map {
 }
 
 public class TilemapManager {
+  // Dependencies
+  private readonly Game _game;
+
+  // State
   public TiledMap TiledMap;
   public TiledMapRenderer TiledMapRenderer;
-
-  // Rectangles for solid colliders
   public List<RectangleF> CollisionRectangles { get; private set; }
-
-  // Rectangles for water colliders
   public List<RectangleF> WaterRectangles { get; private set; }
 
-  private readonly Game _game;
 
   public TilemapManager(Game game) {
     _game = game;

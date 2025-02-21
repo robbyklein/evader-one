@@ -10,8 +10,6 @@ using Microsoft.Xna.Framework.Graphics;
 namespace mgtest.Entities;
 
 public class PlayerEntity : Entity {
-  public string Name = "Player";
-
   // Configuration for animations
   private readonly Dictionary<CharacterAnimationType, AnimationDefinition> _animations = new() {
     [CharacterAnimationType.Idle] = new AnimationDefinition {
@@ -40,9 +38,6 @@ public class PlayerEntity : Entity {
     }
   };
 
-  // Configuration for colliders
-  private readonly PhysicsSize _physicsSize = new(6, 8, 1);
-
   public PlayerEntity(ContentManager content, TilemapManager tilemapManager, SfxManager sfxManager) {
     Position = new Vector2(50f, 20f);
 
@@ -53,9 +48,13 @@ public class PlayerEntity : Entity {
     };
 
     // Initialize Components:
-    var physicsComponent =
-      new Physics(this, _physicsSize, sfxManager, tilemapManager.CollisionRectangles, tilemapManager.WaterRectangles);
-    AddComponent(physicsComponent);
+    AddComponent(new Collider(this));
+
+    // Add the Physics
+    AddComponent(new Physics(this,
+      sfxManager,
+      tilemapManager.CollisionRectangles,
+      tilemapManager.WaterRectangles));
 
     var possessedComponent = new PlayerPossessed(this);
     AddComponent(possessedComponent);

@@ -19,8 +19,6 @@ public class SpriteAnimator : IComponent {
   private CharacterAnimationType _currentAnimationType;
   private AnimationDefinition _currentAnimDef;
   private float _timer;
-
-  // Our frame index, which might represent columns or rows depending on AnimateAcrossColumns
   private int _currentFrameIndex;
 
   public SpriteAnimator(
@@ -33,7 +31,6 @@ public class SpriteAnimator : IComponent {
     _physics = _owner.GetComponent<Physics>(); // might be null
     _animations = animations;
 
-    // Start with a default animation
     SetAnimation(CharacterAnimationType.Idle);
   }
 
@@ -44,8 +41,6 @@ public class SpriteAnimator : IComponent {
       );
     }
 
-    // Always update the animation definition and reset frame state,
-    // even if the animation type is already the current one.
     _currentAnimationType = animType;
     _currentAnimDef = newAnimDef;
     _timer = 0f;
@@ -56,7 +51,6 @@ public class SpriteAnimator : IComponent {
     var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
     _timer += dt;
 
-    // If we have physics, figure out which animation to use
     CharacterAnimationType nextAnimation = _physics == null
       ? _currentAnimationType
       : GetNextAnimationTypeFromPhysics();
@@ -65,16 +59,13 @@ public class SpriteAnimator : IComponent {
       SetAnimation(nextAnimation);
     }
 
-    // Advance frames if enough time has passed
     if (_timer >= _currentAnimDef.FrameTime) {
-      // Increase frame index
       _currentFrameIndex++;
-      // If we exceed EndFrame, wrap around
+
       if (_currentFrameIndex > _currentAnimDef.EndFrame) {
         _currentFrameIndex = _currentAnimDef.StartFrame;
       }
 
-      // Reset timer
       _timer = 0f;
     }
   }
@@ -100,15 +91,12 @@ public class SpriteAnimator : IComponent {
   }
 
   public void Draw(SpriteBatch spriteBatch) {
-    // Figure out row & column from AnimateAcrossColumns
     int row, col;
     if (_currentAnimDef.AnimateAcrossColumns) {
-      // Animate horizontally
       row = _currentAnimDef.Row;
       col = _currentFrameIndex;
     }
     else {
-      // Animate vertically
       col = _currentAnimDef.Row;
       row = _currentFrameIndex;
     }
@@ -120,14 +108,12 @@ public class SpriteAnimator : IComponent {
       _spriteSheet.FrameHeight
     );
 
-    // Default flipping logic
     var spriteEffect = SpriteEffects.None;
     if (_physics != null) {
       spriteEffect = _physics.IsFacingRight
         ? SpriteEffects.None
         : SpriteEffects.FlipHorizontally;
 
-      // If we want the sprite to always face the wall while sliding
       if (_physics.IsWallSliding) {
         spriteEffect = _physics.IsTouchingWallRight
           ? SpriteEffects.FlipHorizontally
@@ -135,15 +121,13 @@ public class SpriteAnimator : IComponent {
       }
     }
 
-
-    // Draw the sprite
     spriteBatch.Draw(
       _spriteSheet.Texture,
       _owner.Position,
       sourceRect,
       Color.White,
       _owner.Rotation,
-      Vector2.Zero, // origin
+      Vector2.Zero,
       _owner.Scale,
       spriteEffect,
       0f
