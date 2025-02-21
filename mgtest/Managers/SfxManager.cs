@@ -10,6 +10,8 @@ public class SfxManager {
 
   public void LoadSounds(Game game) {
     _sounds[Sfx.Jump] = game.Content.Load<SoundEffect>("sfx/jump");
+    _sounds[Sfx.Collect] = game.Content.Load<SoundEffect>("sfx/collect");
+    _sounds[Sfx.Collect2] = game.Content.Load<SoundEffect>("sfx/collect2");
   }
 
   public void PlaySound(Sfx sfx) {

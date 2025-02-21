@@ -5,6 +5,7 @@ using mgtest.Abstracts;
 using mgtest.Components;
 using mgtest.Entities;
 using mgtest.Managers;
+using mgtest.Types;
 using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -70,7 +71,7 @@ public class Playground : Scene {
           // If the colliding entity is a coin, remove it and play a sound.
           if (entity is CoinEntity) {
             _entities.Remove(entity);
-            // _sfxManager.PlaySound(Sfx.CollectCoin);
+            _sfxManager.PlaySound(Sfx.Collect);
           }
         }
       }

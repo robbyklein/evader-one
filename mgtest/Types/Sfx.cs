@@ -1,5 +1,7 @@
 ﻿namespace mgtest.Types;
 
 public enum Sfx {
-  Jump
+  Jump,
+  Collect,
+  Collect2
 }

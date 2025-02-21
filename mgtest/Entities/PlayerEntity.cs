@@ -56,7 +56,7 @@ public class PlayerEntity : Entity {
       tilemapManager.CollisionRectangles,
       tilemapManager.WaterRectangles));
 
-    var possessedComponent = new PlayerPossessed(this);
+    var possessedComponent = new PlayerPossessed(this, sfxManager);
     AddComponent(possessedComponent);
 
     var animationComponent = new SpriteAnimator(this, spriteSheet, _animations);

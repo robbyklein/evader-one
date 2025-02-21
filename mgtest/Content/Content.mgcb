@@ -157,41 +157,23 @@
 /processorParam:TextureFormat=Color
 /build:numbers/9.png
 
-#begin sfx/coin.wav
+#begin sfx/collect.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:sfx/coin.wav
+/build:sfx/collect.wav
 
-#begin sfx/explosion.wav
+#begin sfx/collect2.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:sfx/explosion.wav
-
-#begin sfx/hurt.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sfx/hurt.wav
+/build:sfx/collect2.wav
 
 #begin sfx/jump.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sfx/jump.wav
-
-#begin sfx/power_up.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sfx/power_up.wav
-
-#begin sfx/tap.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:sfx/tap.wav
 
 #begin tilesets/buildings.png
 /importer:TextureImporter
