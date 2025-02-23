@@ -48,18 +48,22 @@ public class PlayerEntity : Entity {
     };
 
     // Initialize Components:
-    AddComponent(new Collider(this));
+    var collider = new Collider(this);
+    AddComponent(collider);
 
     // Add the Physics
-    AddComponent(new Physics(this,
+    var physics = new Physics(this,
       sfxManager,
       tilemapManager.CollisionRectangles,
-      tilemapManager.WaterRectangles));
+      tilemapManager.WaterRectangles,
+      collider
+    );
+    AddComponent(physics);
 
-    var possessedComponent = new PlayerPossessed(this, sfxManager);
+    var possessedComponent = new PlayerPossessed(this, sfxManager, physics);
     AddComponent(possessedComponent);
 
-    var animationComponent = new SpriteAnimator(this, spriteSheet, _animations);
+    var animationComponent = new SpriteAnimator(this, spriteSheet, _animations, physics);
     AddComponent(animationComponent);
   }
 }

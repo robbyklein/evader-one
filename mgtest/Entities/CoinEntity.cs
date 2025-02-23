@@ -30,7 +30,7 @@ public class CoinEntity : Entity {
     var collider = new Collider(this);
     AddComponent(collider);
 
-    var animationComponent = new SpriteAnimator(this, spriteSheet, _animations);
+    var animationComponent = new SpriteAnimator(this, spriteSheet, _animations, new NullPhysics());
     AddComponent(animationComponent);
   }
 }

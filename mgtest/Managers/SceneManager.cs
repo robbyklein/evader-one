@@ -4,12 +4,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace mgtest.Managers;
 
-public class SceneManager {
-  private Scene _currentScene;
-
-  public SceneManager(Scene initialScene) {
-    _currentScene = initialScene;
-  }
+public class SceneManager(Scene initialScene) {
+  private Scene _currentScene = initialScene;
 
   public void LoadContent() {
     _currentScene.LoadContent();

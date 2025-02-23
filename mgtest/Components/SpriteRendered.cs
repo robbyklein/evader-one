@@ -3,23 +3,13 @@ using mgtest.Interfaces;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace mgtest.Components
-{
-  public class SpriteRenderComponent : IComponent
-  {
-    private readonly Entity _owner;
-    private readonly Texture2D _texture;
+namespace mgtest.Components;
 
-    public SpriteRenderComponent(Entity owner, Texture2D texture) {
-      _owner = owner;
-      _texture = texture;
-    }
+public class SpriteRenderComponent(Entity owner, Texture2D texture) : IComponent {
+  public void Update(GameTime gameTime) {
+  }
 
-    public void Update(GameTime gameTime) {
-    }
-
-    public void Draw(SpriteBatch spriteBatch) {
-      spriteBatch.Draw(_texture, _owner.Position, Color.White);
-    }
+  public void Draw(SpriteBatch spriteBatch) {
+    spriteBatch.Draw(texture, owner.Position, Color.White);
   }
 }

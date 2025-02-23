@@ -11,9 +11,8 @@ public enum Map {
   Playground
 }
 
-public class TilemapManager {
+public class TilemapManager(Game game) {
   // Dependencies
-  private readonly Game _game;
 
   // State
   public TiledMap TiledMap;
@@ -21,36 +20,45 @@ public class TilemapManager {
   public List<RectangleF> CollisionRectangles { get; private set; }
   public List<RectangleF> WaterRectangles { get; private set; }
 
-
-  public TilemapManager(Game game) {
-    _game = game;
+  // Lifecycle
+  public void Update(GameTime gameTime) {
+    TiledMapRenderer?.Update(gameTime);
   }
 
-  public void LoadMap(Map map) {
-    // Load the Tiled map
-    TiledMap = _game.Content.Load<TiledMap>("levels/playground");
-    TiledMapRenderer = new TiledMapRenderer(_game.GraphicsDevice, TiledMap);
+  public void Draw() {
+    TiledMapRenderer?.Draw();
+  }
 
+  // Helpers
+  public void LoadMap(Map map) {
+    // Setup tilemap
+    TiledMap = game.Content.Load<TiledMap>("levels/playground");
+    TiledMapRenderer = new TiledMapRenderer(game.GraphicsDevice, TiledMap);
+
+    // Load collisions
+    var collisionLayer = TiledMap.GetLayer<TiledMapObjectLayer>("Collision");
+    LoadCollisions(collisionLayer);
+  }
+
+  private void LoadCollisions(TiledMapObjectLayer collisionLayer) {
+    // initialize lists
     CollisionRectangles = new List<RectangleF>();
     WaterRectangles = new List<RectangleF>();
 
-    var collisionLayer = TiledMap.GetLayer<TiledMapObjectLayer>("Collision");
-    if (collisionLayer != null) {
-      foreach (TiledMapObject obj in collisionLayer.Objects) {
-        // Make sure there's a "tag" property
-        if (!obj.Properties.ContainsKey("tag")) {
-          continue;
-        }
+    foreach (TiledMapObject obj in collisionLayer.Objects) {
+      // Anything importanty will have a tag
+      if (!obj.Properties.ContainsKey("tag")) {
+        continue;
+      }
 
-        var tag = obj.Properties["tag"].ToString();
-        var rect = new RectangleF(obj.Position.X, obj.Position.Y, obj.Size.Width, obj.Size.Height);
+      var tag = obj.Properties["tag"].ToString();
+      var rect = new RectangleF(obj.Position.X, obj.Position.Y, obj.Size.Width, obj.Size.Height);
 
-        if (tag == "solid") {
-          CollisionRectangles.Add(rect);
-        }
-        else if (tag == "water") {
-          WaterRectangles.Add(rect);
-        }
+      if (tag == "solid") {
+        CollisionRectangles.Add(rect);
+      }
+      else if (tag == "water") {
+        WaterRectangles.Add(rect);
       }
     }
   }
@@ -62,13 +70,5 @@ public class TilemapManager {
     TiledMapRenderer?.Dispose();
     TiledMapRenderer = null;
     TiledMap = null;
-  }
-
-  public void Update(GameTime gameTime) {
-    TiledMapRenderer?.Update(gameTime);
-  }
-
-  public void Draw() {
-    TiledMapRenderer?.Draw();
   }
 }

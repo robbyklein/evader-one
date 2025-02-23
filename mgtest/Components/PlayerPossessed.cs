@@ -7,31 +7,17 @@ using Microsoft.Xna.Framework.Input;
 
 namespace mgtest.Components;
 
-public class PlayerPossessed : IComponent {
-  // Parent Entity
-  private readonly Entity _owner;
-
+public class PlayerPossessed(Entity owner, SfxManager sfxManager, Physics physics) : IComponent {
   // Dependencies
-  private readonly Physics _physics;
-  private readonly SfxManager _sfxManager;
+  private readonly Entity _owner = owner;
+  private readonly SfxManager _sfxManager = sfxManager;
 
-  // Track keyboard states
-  private KeyboardState _previousKeyboardState;
+  // State
+  private KeyboardState _previousKeyboardState = Keyboard.GetState();
 
-  public PlayerPossessed(Entity owner, SfxManager sfxManager) {
-    _owner = owner;
-    _sfxManager = sfxManager;
-
-    // Grab the Physics component from this entity (the player)
-    _physics = _owner.GetComponent<Physics>();
-
-    // Initialize the "previous" keyboard state
-    _previousKeyboardState = Keyboard.GetState();
-  }
-
+  // Lifecycle
   public void Update(GameTime gameTime) {
-    // If there's no Physics, nothing to do
-    if (_physics == null) {
+    if (physics == null) {
       return;
     }
 
@@ -39,11 +25,11 @@ public class PlayerPossessed : IComponent {
     KeyboardState currentKeyboardState = Keyboard.GetState();
 
     // Handle left/right movement
-    _physics.MoveInputX = GetMoveX(currentKeyboardState);
+    physics.MoveInputX = GetMoveX(currentKeyboardState);
 
     // Check for jump press
     if (IsJumpJustPressed(currentKeyboardState, _previousKeyboardState)) {
-      _physics.RequestJump();
+      physics.RequestJump();
     }
 
     // Update previous keyboard state
@@ -51,14 +37,10 @@ public class PlayerPossessed : IComponent {
   }
 
   public void Draw(SpriteBatch spriteBatch) {
-    // No visuals needed for possession/controls
   }
 
-  // ---------------------------------------------------------
-  // Private Helpers
-  // ---------------------------------------------------------
+  // Helpers
   private float GetMoveX(KeyboardState ks) {
-    // Simple left/right movement
     var moveX = 0f;
 
     if (ks.IsKeyDown(Keys.Left)) {
@@ -72,7 +54,6 @@ public class PlayerPossessed : IComponent {
   }
 
   private bool IsJumpJustPressed(KeyboardState current, KeyboardState previous) {
-    // "Just pressed" = currently down, previously up
     return current.IsKeyDown(Keys.Space) && previous.IsKeyUp(Keys.Space);
   }
 }

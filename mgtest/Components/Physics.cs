@@ -10,85 +10,65 @@ using MonoGame.Extended;
 
 namespace mgtest.Components;
 
-public class Physics : IComponent {
-  // ---------------------------------------------------------
-  // Basic Physics Settings
-  // ---------------------------------------------------------
-  private readonly float _gravityNormal = 300f;
-  private readonly float _gravityWater = 100f;
-  private readonly float _friction = 0.9f;
-  private readonly float _jumpForce = 100f;
-  private readonly float _maxSpeed = 400f;
-  private readonly float _moveSpeed = 400f;
+public class Physics(
+  Entity owner,
+  SfxManager sfxManager,
+  List<RectangleF> collisionRects,
+  List<RectangleF> waterRects,
+  Collider collider
+) : IPhysics {
+  // Settings
+  private const float GravityNormal = 300f;
+  private const float GravityWater = 100f;
+  private const float Friction = 0.9f;
+  private const float JumpForce = 100f;
+  private const float MaxSpeed = 400f;
+  private const float MoveSpeed = 400f;
+  private const float WallSlideGravityMultiplier = 0.3f;
+  private const float MaxWallSlideSpeed = 15f;
+  private const float WallJumpHorizontalForce = 75f;
 
-  // ---------------------------------------------------------
-  // Wall Slide / Jump
-  // ---------------------------------------------------------
-  private readonly float _wallSlideGravityMultiplier = 0.3f;
-  private readonly float _maxWallSlideSpeed = 15f;
-  private readonly float _wallJumpHorizontalForce = 75f;
-
-  // ---------------------------------------------------------
-  // Dependencies
-  // ---------------------------------------------------------
-  private readonly Entity _owner;
-  private readonly SfxManager _sfxManager;
-  private readonly List<RectangleF> _collisionRects;
-  private readonly List<RectangleF> _waterRects;
-
-  // We'll use the existing Collider instead of our own rectangle
-  private readonly Collider _collider;
-
-  // ---------------------------------------------------------
-  // State
-  // ---------------------------------------------------------
+  // Internal State
   private float _currentGravity;
   private Vector2 _velocity;
   private float _xRemainder;
   private float _yRemainder;
   private bool _jumpRequested;
+  private bool _isTouchingWallLeft;
 
-  // ---------------------------------------------------------
-  // External inputs/flags
-  // ---------------------------------------------------------
-  public float MoveInputX = 0f;
-  public bool IsFacingRight = true;
+  // Public state
+  public float MoveInputX { get; set; } = 0f;
+  public bool IsTouchingWallRight { get; private set; }
+  public bool IsFacingRight { get; private set; } = true;
   public bool IsGrounded { get; private set; }
 
-  // Wall checks
-  public bool IsTouchingWallLeft { get; private set; }
-  public bool IsTouchingWallRight { get; private set; }
 
-  public Physics(
-    Entity owner,
-    SfxManager sfxManager,
-    List<RectangleF> collisionRects,
-    List<RectangleF> waterRects
-  ) {
-    _owner = owner;
-    _sfxManager = sfxManager;
-    _collisionRects = collisionRects;
-    _waterRects = waterRects;
-
-    // Ensure there's a Collider on this entity
-    _collider = _owner.GetComponent<Collider>()
-                ?? throw new InvalidOperationException(
-                  "Physics requires a Collider component on the same entity!"
-                );
-  }
-
+  // Lifecycle
   public void Update(GameTime gameTime) {
     var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+    UpdateGravity();
+    UpdateMovementX(dt);
+    UpdateWallCheck();
+    ApplyGravity(dt);
+    ApplyJump();
+    ApplyMovement(dt);
+    UpdateGrounded();
+  }
 
-    // 1) Determine if in water -> set gravity
-    bool isInWater = IsInWater();
-    _currentGravity = isInWater ? _gravityWater : _gravityNormal;
+  public void Draw(SpriteBatch spriteBatch) {
+  }
 
-    // 2) Horizontal movement
-    _velocity.X += MoveInputX * _moveSpeed * dt;
-    _velocity.X = MathHelper.Clamp(_velocity.X, -_maxSpeed, _maxSpeed);
+  // Frame udpates
+  private void UpdateGravity() {
+    _currentGravity = IsInWater() ? GravityWater : GravityNormal;
+  }
 
-    // Update facing direction
+  private void UpdateMovementX(float dt) {
+    // Velocity
+    _velocity.X += MoveInputX * MoveSpeed * dt;
+    _velocity.X = MathHelper.Clamp(_velocity.X, -MaxSpeed, MaxSpeed);
+
+    // Facing
     if (MoveInputX > 0.01f) {
       IsFacingRight = true;
     }
@@ -96,150 +76,214 @@ public class Physics : IComponent {
       IsFacingRight = false;
     }
 
-    // Apply friction
-    _velocity.X *= _friction;
+    // Friction
+    _velocity.X *= Friction;
     if (Math.Abs(_velocity.X) < 0.1f) {
       _velocity.X = 0f;
     }
+  }
 
-    // 3) Update wall checks
-    UpdateWallCheck();
-
-    // 4) Apply gravity (considering wall-slide)
-    if (!IsGrounded) {
-      float gravityToUse = _currentGravity;
-
-      // If pressing into wall while falling, reduce gravity
-      bool pressingLeftOnLeftWall = IsTouchingWallLeft && MoveInputX < 0f;
-      bool pressingRightOnRightWall = IsTouchingWallRight && MoveInputX > 0f;
-      if ((pressingLeftOnLeftWall || pressingRightOnRightWall) && _velocity.Y > 0f) {
-        gravityToUse *= _wallSlideGravityMultiplier;
-      }
-
-      _velocity.Y += gravityToUse * dt;
-
-      // Optionally clamp downward speed during wall-slide
-      if (
-        (pressingLeftOnLeftWall || pressingRightOnRightWall) &&
-        _velocity.Y > _maxWallSlideSpeed
-      ) {
-        _velocity.Y = _maxWallSlideSpeed;
-      }
+  private void ApplyGravity(float dt) {
+    if (IsGrounded) {
+      return;
     }
 
-    // 5) Jump logic
-    if (_jumpRequested) {
-      if (IsGrounded) {
-        // Normal jump
-        _velocity.Y = -_jumpForce;
-        _sfxManager.PlaySound(Sfx.Jump);
-      }
-      else {
-        // Must be on a wall AND pressing into the wall:
-        bool pressingLeftAgainstLeftWall =
-          IsTouchingWallLeft && MoveInputX < -0.1f;
-        bool pressingRightAgainstRightWall =
-          IsTouchingWallRight && MoveInputX > +0.1f;
+    // Copy so we don't effect class state
+    float gravityToUse = _currentGravity;
 
-        if (pressingLeftAgainstLeftWall || pressingRightAgainstRightWall) {
-          WallJump();
-        }
-      }
+    // Lessen gravity if wall sliding
+    bool pressedAgainstWall = PressedAgainstWall();
 
-      _jumpRequested = false;
+    if (pressedAgainstWall && _velocity.Y > 0f) {
+      gravityToUse *= WallSlideGravityMultiplier;
     }
 
-    // 6) Movement & collisions
+    // Apply gravity
+    _velocity.Y += gravityToUse * dt;
+
+    // Max sliding speed
+    if (pressedAgainstWall && _velocity.Y > MaxWallSlideSpeed) {
+      _velocity.Y = MaxWallSlideSpeed;
+    }
+  }
+
+  private void ApplyJump() {
+    if (!_jumpRequested) {
+      return;
+    }
+
+    // Ground jumps
+    if (IsGrounded) {
+      Jump();
+    }
+    // Wall jumps
+    else if (PressedAgainstWall()) {
+      WallJump();
+    }
+
+    // Reset jump
+    _jumpRequested = false;
+  }
+
+  private void Jump() {
+    _velocity.Y = -JumpForce;
+    sfxManager.PlaySound(Sfx.Jump);
+  }
+
+  private void ApplyMovement(float dt) {
     MoveX(_velocity.X * dt);
     MoveY(_velocity.Y * dt);
-
-    // 7) Check if grounded
-    CheckIfGrounded();
   }
 
-  public void Draw(SpriteBatch spriteBatch) {
-    // No-op for Physics
+  private void UpdateWallCheck() {
+    // Reset state
+    _isTouchingWallLeft = false;
+    IsTouchingWallRight = false;
+
+    // Only matter when off ground
+    if (IsGrounded) {
+      return;
+    }
+
+    // Check both directions
+    Vector2 leftCheckPos = owner.Position + new Vector2(-1, 0); // 1 pixel left
+    Vector2 rightCheckPos = owner.Position + new Vector2(+1, 0); // 1 pixel right
+
+    // Update if touching
+    if (IsColliding(leftCheckPos)) {
+      _isTouchingWallLeft = true;
+    }
+
+    if (IsColliding(rightCheckPos)) {
+      IsTouchingWallRight = true;
+    }
   }
 
-  public void RequestJump() {
-    _jumpRequested = true;
+  private void UpdateGrounded() {
+    // Check one pixel below the current position
+    RectangleF nextPosition = collider.GetProjectedBounds(
+      owner.Position + new Vector2(0, 1)
+    );
+
+    IsGrounded = false;
+
+    foreach (RectangleF rect in collisionRects) {
+      if (nextPosition.Intersects(rect)) {
+        IsGrounded = true;
+        break;
+      }
+    }
   }
 
+  // Handlers
   private void WallJump() {
-    // Determine direction based on which wall you're touching
-    if (IsTouchingWallLeft) {
-      _velocity.X = +_wallJumpHorizontalForce;
+    // Horizontal force
+    if (PressedAgainstLeftWall()) {
+      _velocity.X = +WallJumpHorizontalForce;
       IsFacingRight = true;
     }
-    else if (IsTouchingWallRight) {
-      _velocity.X = -_wallJumpHorizontalForce;
+    else if (PressedAgainstRightWall()) {
+      _velocity.X = -WallJumpHorizontalForce;
       IsFacingRight = false;
     }
 
     // Vertical force
-    _velocity.Y = -_jumpForce;
+    _velocity.Y = -JumpForce;
     IsGrounded = false;
 
-    _sfxManager.PlaySound(Sfx.Jump);
+    // Play sfx
+    sfxManager.PlaySound(Sfx.Jump);
   }
 
-  // ---------------------------------------------------------
-  // Movement + Collision
-  // ---------------------------------------------------------
   private void MoveX(float distance) {
+    // Accumulate the movement remainder to handle subpixel movement
     _xRemainder += distance;
+
+    // Determine the integer movement amount by rounding the remainder
     var move = (int)MathF.Round(_xRemainder);
+
     if (move != 0) {
+      // Subtract the applied movement from the remainder
       _xRemainder -= move;
+
+      // Determine movement direction (1 for right, -1 for left)
       int sign = Math.Sign(move);
 
+      // Process movement one step at a time
       while (move != 0) {
-        var nextPos = new Vector2(_owner.Position.X + sign, _owner.Position.Y);
+        // Calculate the next position
+        var nextPos = new Vector2(owner.Position.X + sign, owner.Position.Y);
+
+        // Check for collision at the next position
         if (IsColliding(nextPos)) {
-          _velocity.X = 0;
+          _velocity.X = 0; // Stop movement on collision
           break;
         }
 
-        _owner.Position.X += sign;
+        // Apply movement step
+        owner.Position.X += sign;
         move -= sign;
       }
     }
   }
 
   private void MoveY(float distance) {
+    // Accumulate the movement remainder to handle subpixel movement
     _yRemainder += distance;
+
+    // Determine the integer movement amount by rounding the remainder
     var move = (int)MathF.Round(_yRemainder);
+
     if (move != 0) {
+      // Subtract the applied movement from the remainder
       _yRemainder -= move;
+
+      // Determine movement direction (1 for down, -1 for up)
       int sign = Math.Sign(move);
 
+      // Process movement one step at a time
       while (move != 0) {
-        var nextPos = new Vector2(_owner.Position.X, _owner.Position.Y + sign);
+        // Calculate the next position
+        var nextPos = new Vector2(owner.Position.X, owner.Position.Y + sign);
+
+        // Check for collision at the next position
         if (IsColliding(nextPos)) {
-          // If we hit something while moving down => grounded
+          // If colliding while moving downward, mark as grounded
           if (sign > 0) {
             IsGrounded = true;
           }
 
-          _velocity.Y = 0;
+          _velocity.Y = 0; // Stop vertical movement on collision
           break;
         }
 
-        _owner.Position.Y += sign;
+        // Apply movement step
+        owner.Position.Y += sign;
         move -= sign;
       }
     }
   }
 
-  /// <summary>
-  ///   Checks if the entity’s collider would intersect any solid tile at the given position.
-  /// </summary>
-  private bool IsColliding(Vector2 newPosition) {
-    // "Project" the collider as if the entity were at newPosition
-    RectangleF testRect = _collider.GetProjectedBounds(newPosition);
+  // Helpers
+  private bool PressedAgainstLeftWall() {
+    return _isTouchingWallLeft && MoveInputX < -0.1f;
+  }
 
-    foreach (RectangleF rect in _collisionRects) {
-      if (testRect.Intersects(rect)) {
+  private bool PressedAgainstRightWall() {
+    return IsTouchingWallRight && MoveInputX > +0.1f;
+  }
+
+  private bool PressedAgainstWall() {
+    return PressedAgainstLeftWall() || PressedAgainstRightWall();
+  }
+
+  private bool IsColliding(Vector2 newPosition) {
+    // Get colliders next position
+    RectangleF nextPosition = collider.GetProjectedBounds(newPosition);
+
+    // Check for collisions
+    foreach (RectangleF rect in collisionRects) {
+      if (nextPosition.Intersects(rect)) {
         return true;
       }
     }
@@ -247,25 +291,10 @@ public class Physics : IComponent {
     return false;
   }
 
-  private void CheckIfGrounded() {
-    // Check one pixel below the current position
-    RectangleF testRect = _collider.GetProjectedBounds(
-      _owner.Position + new Vector2(0, 1)
-    );
-
-    IsGrounded = false;
-    foreach (RectangleF rect in _collisionRects) {
-      if (testRect.Intersects(rect)) {
-        IsGrounded = true;
-        break;
-      }
-    }
-  }
-
   private bool IsInWater() {
-    // Use the current collider bounds
-    RectangleF playerRect = _collider.Bounds;
-    foreach (RectangleF waterRect in _waterRects) {
+    RectangleF playerRect = collider.Bounds;
+
+    foreach (RectangleF waterRect in waterRects) {
       if (playerRect.Intersects(waterRect)) {
         return true;
       }
@@ -274,25 +303,11 @@ public class Physics : IComponent {
     return false;
   }
 
-  private void UpdateWallCheck() {
-    IsTouchingWallLeft = false;
-    IsTouchingWallRight = false;
-
-    if (!IsGrounded) {
-      Vector2 leftCheckPos = _owner.Position + new Vector2(-1, 0);
-      Vector2 rightCheckPos = _owner.Position + new Vector2(+1, 0);
-
-      if (IsColliding(leftCheckPos)) {
-        IsTouchingWallLeft = true;
-      }
-
-      if (IsColliding(rightCheckPos)) {
-        IsTouchingWallRight = true;
-      }
-    }
+  // Externals
+  public void RequestJump() {
+    _jumpRequested = true;
   }
 
-  // For the animator if needed
   public bool IsWallSliding {
     get {
       if (IsGrounded) {
@@ -300,7 +315,7 @@ public class Physics : IComponent {
       }
 
       // Must be pressing into the wall
-      bool pressingLeftOnLeftWall = IsTouchingWallLeft && MoveInputX < 0f;
+      bool pressingLeftOnLeftWall = _isTouchingWallLeft && MoveInputX < 0f;
       bool pressingRightOnRightWall = IsTouchingWallRight && MoveInputX > 0f;
       bool movingDown = _velocity.Y > 0f;
       return (pressingLeftOnLeftWall || pressingRightOnRightWall) && movingDown;

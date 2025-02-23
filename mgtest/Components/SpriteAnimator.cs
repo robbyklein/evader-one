@@ -11,7 +11,7 @@ namespace mgtest.Components;
 public class SpriteAnimator : IComponent {
   // Dependencies
   private readonly Entity _owner;
-  private readonly Physics? _physics; // optional
+  private readonly IPhysics _physics;
   private readonly Dictionary<CharacterAnimationType, AnimationDefinition> _animations;
   private readonly SpriteSheet _spriteSheet;
 
@@ -21,30 +21,19 @@ public class SpriteAnimator : IComponent {
   private float _timer;
   private int _currentFrameIndex;
 
+  // Lifecycle
   public SpriteAnimator(
     Entity owner,
     SpriteSheet spriteSheet,
-    Dictionary<CharacterAnimationType, AnimationDefinition> animations
+    Dictionary<CharacterAnimationType, AnimationDefinition> animations,
+    IPhysics physics
   ) {
     _owner = owner;
     _spriteSheet = spriteSheet;
-    _physics = _owner.GetComponent<Physics>(); // might be null
+    _physics = physics;
     _animations = animations;
 
     SetAnimation(CharacterAnimationType.Idle);
-  }
-
-  public void SetAnimation(CharacterAnimationType animType) {
-    if (!_animations.TryGetValue(animType, out AnimationDefinition newAnimDef)) {
-      throw new KeyNotFoundException(
-        $"Animation type {animType} not found in _animations dictionary."
-      );
-    }
-
-    _currentAnimationType = animType;
-    _currentAnimDef = newAnimDef;
-    _timer = 0f;
-    _currentFrameIndex = _currentAnimDef.StartFrame;
   }
 
   public void Update(GameTime gameTime) {
@@ -68,26 +57,6 @@ public class SpriteAnimator : IComponent {
 
       _timer = 0f;
     }
-  }
-
-  private CharacterAnimationType GetNextAnimationTypeFromPhysics() {
-    if (_physics == null) {
-      return _currentAnimationType;
-    }
-
-    if (_physics.IsWallSliding) {
-      return CharacterAnimationType.WallSlide;
-    }
-
-    if (!_physics.IsGrounded) {
-      return CharacterAnimationType.Jump;
-    }
-
-    if (_physics.IsGrounded && _physics.MoveInputX != 0f) {
-      return CharacterAnimationType.Walk;
-    }
-
-    return CharacterAnimationType.Idle;
   }
 
   public void Draw(SpriteBatch spriteBatch) {
@@ -132,5 +101,39 @@ public class SpriteAnimator : IComponent {
       spriteEffect,
       0f
     );
+  }
+
+  // Helpers
+  private void SetAnimation(CharacterAnimationType animType) {
+    if (!_animations.TryGetValue(animType, out AnimationDefinition newAnimDef)) {
+      throw new KeyNotFoundException(
+        $"Animation type {animType} not found in _animations dictionary."
+      );
+    }
+
+    _currentAnimationType = animType;
+    _currentAnimDef = newAnimDef;
+    _timer = 0f;
+    _currentFrameIndex = _currentAnimDef.StartFrame;
+  }
+
+  private CharacterAnimationType GetNextAnimationTypeFromPhysics() {
+    if (_physics == null) {
+      return _currentAnimationType;
+    }
+
+    if (_physics.IsWallSliding) {
+      return CharacterAnimationType.WallSlide;
+    }
+
+    if (!_physics.IsGrounded) {
+      return CharacterAnimationType.Jump;
+    }
+
+    if (_physics.IsGrounded && _physics.MoveInputX != 0f) {
+      return CharacterAnimationType.Walk;
+    }
+
+    return CharacterAnimationType.Idle;
   }
 }
