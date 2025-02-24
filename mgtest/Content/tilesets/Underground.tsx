@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.10" tiledversion="1.11.2" name="Underground" tilewidth="8" tileheight="8" tilecount="1118" columns="26">
- <image source="underground.png" width="208" height="344"/>
+ <image source="../sprites/underground.png" width="208" height="344"/>
  <tile id="0">
   <properties>
    <property name="ground" type="bool" value="true"/>

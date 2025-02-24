@@ -14,7 +14,9 @@ public static class EntityBuilder {
     ref Entity playerEntity,
     ContentManager content,
     TilemapManager tilemapManager,
-    SfxManager sfxManager) {
+    SfxManager sfxManager,
+    InputManager inputManager
+  ) {
     foreach (TiledMapObject obj in layer.Objects) {
       // Get the object type
       var objType = string.Empty;
@@ -31,7 +33,7 @@ public static class EntityBuilder {
 
       switch (objType) {
         case "player":
-          playerEntity = new PlayerEntity(content, tilemapManager, sfxManager);
+          playerEntity = new PlayerEntity(content, tilemapManager, sfxManager, inputManager);
           playerEntity.Position = position;
           entities.Add(playerEntity);
           break;

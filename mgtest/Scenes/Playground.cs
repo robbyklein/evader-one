@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using mgtest.Abstracts;
 using mgtest.Components;
 using mgtest.Entities;
@@ -15,16 +14,21 @@ using MonoGame.Extended.Tiled;
 namespace mgtest.Scenes;
 
 public class Playground : Scene {
+  // Components
   private Song _musicPlayer;
   private Entity _playerEntity;
   private List<Entity> _entities;
   private Camera _camera;
   private TilemapManager _tilemapManager;
   private readonly SfxManager _sfxManager;
+  private readonly InputManager _inputManager;
 
+  // Lifecycle
   public Playground(Game1 game) : base(game) {
     _tilemapManager = new TilemapManager(Game);
     _sfxManager = new SfxManager();
+    _inputManager = new InputManager();
+
     MediaPlayer.IsRepeating = true;
   }
 
@@ -35,8 +39,16 @@ public class Playground : Scene {
     _musicPlayer = Game.Content.Load<Song>("music/one");
     _entities = new List<Entity>();
 
-    var entityLayer = _tilemapManager.TiledMap.GetLayer<TiledMapObjectLayer>("Entities");
-    EntityBuilder.LoadEntities(entityLayer, _entities, ref _playerEntity, Game.Content, _tilemapManager, _sfxManager);
+    TiledMapObjectLayer entityLayer = _tilemapManager.GetLayer(MapLayer.Entities);
+    EntityBuilder.LoadEntities(
+      entityLayer,
+      _entities,
+      ref _playerEntity,
+      Game.Content,
+      _tilemapManager,
+      _sfxManager,
+      _inputManager
+    );
 
     MediaPlayer.Play(_musicPlayer);
   }
@@ -50,6 +62,8 @@ public class Playground : Scene {
   }
 
   public override void Update(GameTime gameTime) {
+    _inputManager.Update(gameTime);
+
     _tilemapManager.Update(gameTime);
     foreach (Entity entity in _entities) {
       entity.Update(gameTime);
@@ -65,9 +79,6 @@ public class Playground : Scene {
 
         var coinCollider = entity.GetComponent<Collider>();
         if (coinCollider != null && playerCollider.Bounds.Intersects(coinCollider.Bounds)) {
-          // Debug: Log collision details
-          Debug.WriteLine($"Collision detected: Player {playerCollider.Bounds} - Entity {coinCollider.Bounds}");
-
           // If the colliding entity is a coin, remove it and play a sound.
           if (entity is CoinEntity) {
             _entities.Remove(entity);
@@ -85,8 +96,10 @@ public class Playground : Scene {
   public override void Draw(SpriteBatch spriteBatch) {
     // Save original layer visibilities.
     var originalVisibilities = new Dictionary<string, bool>();
+
     foreach (TiledMapLayer layer in _tilemapManager.TiledMap.Layers) {
       originalVisibilities[layer.Name] = layer.IsVisible;
+
       if (layer.Name.Equals("Foreground", StringComparison.OrdinalIgnoreCase)) {
         layer.IsVisible = false;
       }

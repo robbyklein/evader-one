@@ -22,19 +22,27 @@
             "scaleInEditor": 1
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx": {
-            "scale": 3,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 479.99999999999994,
-                "y": 91.66666666666666
+                "x": 17,
+                "y": 24
             }
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/splash.tmx": {
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 115.75,
-                "y": -47.25
+                "x": 139,
+                "y": 26
+            }
+        },
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/title.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 158.66666666666663,
+                "y": -62
             }
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Items.tsx": {
@@ -45,12 +53,24 @@
             "scaleInDock": 2,
             "scaleInEditor": 3
         },
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Player.tsx": {
+            "scaleInDock": 5.5,
+            "scaleInEditor": 1
+        },
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Sky.tsx": {
+            "scaleInDock": 2,
+            "scaleInEditor": 1
+        },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Tileset.tsx": {
             "scaleInDock": 3,
             "scaleInEditor": 3
         },
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Trees.tsx": {
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1.5
+        },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Underground.tsx": {
-            "scaleInDock": 4,
+            "scaleInDock": 2,
             "scaleInEditor": 3
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Water.tsx": {
@@ -73,11 +93,13 @@
     "frame.defaultDuration": 200,
     "last.exportedFilePath": "C:/Users/hello/Developer/mgtest/mgtest/Content/levels",
     "last.externalTilesetPath": "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets",
-    "last.imagePath": "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets",
+    "last.imagePath": "C:/Users/hello/Developer/mgtest/mgtest/Content/sprites",
+    "map.height": 23,
     "map.lastUsedExportFilter": "Tiled map files (*.tmx *.xml)",
     "map.lastUsedFormat": "tmx",
-    "map.tileHeight": 16,
-    "map.tileWidth": 16,
+    "map.tileHeight": 8,
+    "map.tileWidth": 8,
+    "map.width": 40,
     "openFiles": [
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Water.tsx",
@@ -89,16 +111,18 @@
     "project": "tiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Water.tsx",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Underground.tsx",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Overworld.tsx",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Tileset.tsx",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Items.tsx",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/Underground.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Player.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Trees.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Sky.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/title.tmx",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/splash.tmx",
-        "mgtest/Content/levels/playground.tmx",
-        "mgtest/Content/tilesets/Tileset.tsx"
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Items.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Tileset.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Overworld.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Underground.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Water.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/Underground.tsx"
     ],
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx",

@@ -1,59 +1,47 @@
 ﻿using mgtest.Entities;
 using mgtest.Interfaces;
+using mgtest.Types;
 using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace mgtest.Components;
 
-public class PlayerPossessed(Entity owner, SfxManager sfxManager, Physics physics) : IComponent {
+public class PlayerPossessed(Entity owner, SfxManager sfxManager, Physics physics, InputManager inputManager)
+  : IComponent {
   // Dependencies
   private readonly Entity _owner = owner;
   private readonly SfxManager _sfxManager = sfxManager;
 
-  // State
-  private KeyboardState _previousKeyboardState = Keyboard.GetState();
-
-  // Lifecycle
   public void Update(GameTime gameTime) {
-    if (physics == null) {
-      return;
-    }
+    // Assume InputManager.Update(gameTime) is called in your main game loop.
 
-    // Gather current keyboard input
-    KeyboardState currentKeyboardState = Keyboard.GetState();
+    // Handle left/right movement using our input actions (or direct key mapping)
+    physics.MoveInputX = GetMoveX();
 
-    // Handle left/right movement
-    physics.MoveInputX = GetMoveX(currentKeyboardState);
-
-    // Check for jump press
-    if (IsJumpJustPressed(currentKeyboardState, _previousKeyboardState)) {
+    // Check for jump press using the InputManager's action or key check
+    // Here, assuming you mapped Jump to Space (or corresponding gamepad button)
+    if (inputManager.IsActionPressed(InputAction.Jump)) {
       physics.RequestJump();
     }
-
-    // Update previous keyboard state
-    _previousKeyboardState = currentKeyboardState;
   }
 
   public void Draw(SpriteBatch spriteBatch) {
+    // Drawing logic for the player, if needed.
   }
 
-  // Helpers
-  private float GetMoveX(KeyboardState ks) {
+  // Helper method for movement input
+  private float GetMoveX() {
     var moveX = 0f;
 
-    if (ks.IsKeyDown(Keys.Left)) {
+    // Check if the MoveLeft action is active (maps to Keys.A/Left, etc.)
+    if (inputManager.IsActionDown(InputAction.MoveLeft)) {
       moveX = -1f;
     }
-    else if (ks.IsKeyDown(Keys.Right)) {
+    else if (inputManager.IsActionDown(InputAction.MoveRight)) {
       moveX = 1f;
     }
 
     return moveX;
-  }
-
-  private bool IsJumpJustPressed(KeyboardState current, KeyboardState previous) {
-    return current.IsKeyDown(Keys.Space) && previous.IsKeyUp(Keys.Space);
   }
 }

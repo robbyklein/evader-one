@@ -38,17 +38,18 @@ public class PlayerEntity : Entity {
     }
   };
 
-  public PlayerEntity(ContentManager content, TilemapManager tilemapManager, SfxManager sfxManager) {
+  public PlayerEntity(ContentManager content, TilemapManager tilemapManager, SfxManager sfxManager,
+    InputManager inputManager) {
     Position = new Vector2(50f, 20f);
 
     var spriteSheet = new SpriteSheet {
       Rows = 48,
       Columns = 14,
-      Texture = content.Load<Texture2D>("tilesets/player")
+      Texture = content.Load<Texture2D>("sprites/player")
     };
 
     // Initialize Components:
-    var collider = new Collider(this);
+    var collider = new Collider(this, 6, 8, 1);
     AddComponent(collider);
 
     // Add the Physics
@@ -60,7 +61,7 @@ public class PlayerEntity : Entity {
     );
     AddComponent(physics);
 
-    var possessedComponent = new PlayerPossessed(this, sfxManager, physics);
+    var possessedComponent = new PlayerPossessed(this, sfxManager, physics, inputManager);
     AddComponent(possessedComponent);
 
     var animationComponent = new SpriteAnimator(this, spriteSheet, _animations, physics);

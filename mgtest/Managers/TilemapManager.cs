@@ -11,9 +11,14 @@ public enum Map {
   Playground
 }
 
-public class TilemapManager(Game game) {
-  // Dependencies
+public enum MapLayer {
+  Foreground,
+  Background,
+  Entities,
+  Collision
+}
 
+public class TilemapManager(Game game) {
   // State
   public TiledMap TiledMap;
   public TiledMapRenderer TiledMapRenderer;
@@ -46,7 +51,7 @@ public class TilemapManager(Game game) {
     WaterRectangles = new List<RectangleF>();
 
     foreach (TiledMapObject obj in collisionLayer.Objects) {
-      // Anything importanty will have a tag
+      // Anything important will have a tag
       if (!obj.Properties.ContainsKey("tag")) {
         continue;
       }
@@ -70,5 +75,20 @@ public class TilemapManager(Game game) {
     TiledMapRenderer?.Dispose();
     TiledMapRenderer = null;
     TiledMap = null;
+  }
+
+  public TiledMapObjectLayer GetLayer(MapLayer layer) {
+    switch (layer) {
+      case MapLayer.Foreground:
+        return TiledMap.GetLayer<TiledMapObjectLayer>("Foreground");
+      case MapLayer.Background:
+        return TiledMap.GetLayer<TiledMapObjectLayer>("Background");
+      case MapLayer.Entities:
+        return TiledMap.GetLayer<TiledMapObjectLayer>("Entities");
+      case MapLayer.Collision:
+        return TiledMap.GetLayer<TiledMapObjectLayer>("Collision");
+      default:
+        return null;
+    }
   }
 }
