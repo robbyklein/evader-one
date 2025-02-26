@@ -1,52 +1,70 @@
 ﻿using mgtest.Abstracts;
+using mgtest.Managers;
 using mgtest.Types;
+using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
-using MonoGame.Extended.Tiled;
-using MonoGame.Extended.Tiled.Renderers;
 
 namespace mgtest.Scenes;
 
-public class Title : Scene {
-  private TiledMap _tiledMap;
-  private TiledMapRenderer _tiledMapRenderer;
-  private readonly InputManager _inputManager;
-  private Song _musicPlayer;
+public class Title : GameScene {
+  // Blink fields for "PRESS START!" text.
+  private float _blinkTimer;
+  private bool _showPressStart = true;
+  private const float BlinkInterval = 1.0f; // 1 second
+
+  // Fade settings for music.
+  private const float FadeDuration = 5.0f;
+  private const float TargetVolume = 1.0f;
 
   public Title(Game1 game) : base(game) {
-    _inputManager = new InputManager();
-
     MediaPlayer.IsRepeating = true;
   }
 
   public override void LoadContent() {
-    _tiledMap = Game.Content.Load<TiledMap>("levels/title");
-    _tiledMapRenderer = new TiledMapRenderer(Game.GraphicsDevice, _tiledMap);
-    _musicPlayer = Game.Content.Load<Song>("music/one");
+    LoadCommonContent();
 
-    MediaPlayer.Play(_musicPlayer);
-  }
+    LoadGameContent(Map.Title, "music/title");
 
-  public override void UnloadContent() {
-    _tiledMapRenderer = null;
-    _tiledMap = null;
+    MediaPlayer.Volume = 0.0f;
   }
 
   public override void Update(GameTime gameTime) {
-    _tiledMapRenderer.Update(gameTime);
-    _inputManager.Update(gameTime);
+    var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-    if (
-      _inputManager.IsActionPressed(InputAction.Jump) ||
-      _inputManager.IsActionPressed(InputAction.Start)
-    ) {
+    // Fade in music.
+    MediaPlayer.Volume = AudioUtilities.UpdateVolume(MediaPlayer.Volume, TargetVolume, FadeDuration, dt);
+
+    // Update blink timer for "PRESS START!" text.
+    _blinkTimer += dt;
+    if (_blinkTimer >= BlinkInterval) {
+      _blinkTimer -= BlinkInterval;
+      _showPressStart = !_showPressStart;
+    }
+
+    // Update common game content.
+    base.Update(gameTime);
+
+    // Check input for starting the game.
+    InputManager.Update(gameTime);
+
+    if (InputManager.IsActionPressed(InputAction.Start)) {
+      SfxManager.PlaySound(Sfx.Collect);
       Game.SceneManager.ChangeScene(new Playground(Game));
     }
   }
 
   public override void Draw(SpriteBatch spriteBatch) {
-    Game.GraphicsDevice.Clear(Color.Black);
-    _tiledMapRenderer.Draw();
+    // First, let the base class draw the tilemap and entities.
+    base.Draw(spriteBatch);
+
+    // Then draw title-specific UI on top (like blinking "PRESS START!").
+    spriteBatch.Begin(transformMatrix: Camera.Transform);
+    if (_showPressStart) {
+      BitmapFont.DrawString(spriteBatch, "PRESS START!", new Vector2(114, 76), Color.White);
+    }
+
+    spriteBatch.End();
   }
 }

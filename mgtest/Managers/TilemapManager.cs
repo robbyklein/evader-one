@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.Tiled;
@@ -8,7 +9,8 @@ namespace mgtest.Managers;
 
 public enum Map {
   Splash,
-  Playground
+  Playground,
+  Title
 }
 
 public enum MapLayer {
@@ -18,14 +20,22 @@ public enum MapLayer {
   Collision
 }
 
-public class TilemapManager(Game game) {
-  // State
+public class TilemapManager {
+  private readonly Game game;
+
   public TiledMap TiledMap;
   public TiledMapRenderer TiledMapRenderer;
   public List<RectangleF> CollisionRectangles { get; private set; }
+
   public List<RectangleF> WaterRectangles { get; private set; }
 
-  // Lifecycle
+  // New list to hold objects that should not count as walls for wall jumping.
+  public List<RectangleF> NoWallRectangles { get; private set; }
+
+  public TilemapManager(Game game) {
+    this.game = game;
+  }
+
   public void Update(GameTime gameTime) {
     TiledMapRenderer?.Update(gameTime);
   }
@@ -34,36 +44,95 @@ public class TilemapManager(Game game) {
     TiledMapRenderer?.Draw();
   }
 
-  // Helpers
   public void LoadMap(Map map) {
-    // Setup tilemap
-    TiledMap = game.Content.Load<TiledMap>("levels/playground");
-    TiledMapRenderer = new TiledMapRenderer(game.GraphicsDevice, TiledMap);
+    switch (map) {
+      case Map.Splash:
+        TiledMap = game.Content.Load<TiledMap>("levels/splash");
+        break;
+      case Map.Playground:
+        TiledMap = game.Content.Load<TiledMap>("levels/playground");
+        break;
+      case Map.Title:
+        TiledMap = game.Content.Load<TiledMap>("levels/title");
+        break;
+    }
 
-    // Load collisions
-    var collisionLayer = TiledMap.GetLayer<TiledMapObjectLayer>("Collision");
-    LoadCollisions(collisionLayer);
+    TiledMapRenderer = new TiledMapRenderer(game.GraphicsDevice, TiledMap);
+    LoadHybridCollisions();
   }
 
-  private void LoadCollisions(TiledMapObjectLayer collisionLayer) {
-    // initialize lists
+  private void LoadHybridCollisions() {
     CollisionRectangles = new List<RectangleF>();
     WaterRectangles = new List<RectangleF>();
+    NoWallRectangles = new List<RectangleF>();
 
-    foreach (TiledMapObject obj in collisionLayer.Objects) {
-      // Anything important will have a tag
-      if (!obj.Properties.ContainsKey("tag")) {
-        continue;
+    // 1. Load collisions from the dedicated object layer (if available)
+    var collisionLayer = TiledMap.GetLayer<TiledMapObjectLayer>("Collision");
+    if (collisionLayer != null) {
+      foreach (TiledMapObject obj in collisionLayer.Objects) {
+        var rect = new RectangleF(obj.Position.X, obj.Position.Y, obj.Size.Width, obj.Size.Height);
+
+        if (obj.Properties.TryGetValue("tag", out string tag)) {
+          if (tag == "solid") {
+            CollisionRectangles.Add(rect);
+          }
+          else if (tag == "water") {
+            WaterRectangles.Add(rect);
+          }
+          else if (tag == "no walls") {
+            // Collide normally but ignore for wall jumping.
+            CollisionRectangles.Add(rect);
+            NoWallRectangles.Add(rect);
+          }
+        }
+        else {
+          CollisionRectangles.Add(rect);
+        }
       }
+    }
 
-      var tag = obj.Properties["tag"].ToString();
-      var rect = new RectangleF(obj.Position.X, obj.Position.Y, obj.Size.Width, obj.Size.Height);
+    // 2. Load collisions from tile layers (embedded collision data)
+    foreach (TiledMapTileLayer tileLayer in TiledMap.TileLayers) {
+      for (var y = 0; y < tileLayer.Height; y++) {
+        for (var x = 0; x < tileLayer.Width; x++) {
+          TiledMapTile tile = tileLayer.GetTile((ushort)x, (ushort)y);
+          if (tile.IsBlank) {
+            continue;
+          }
 
-      if (tag == "solid") {
-        CollisionRectangles.Add(rect);
-      }
-      else if (tag == "water") {
-        WaterRectangles.Add(rect);
+          TiledMapTileset tileSet = TiledMap.GetTilesetByTileGlobalIdentifier(tile.GlobalIdentifier);
+          if (tileSet == null) {
+            continue;
+          }
+
+          int firstGlobal = TiledMap.GetTilesetFirstGlobalIdentifier(tileSet);
+          int localTileId = tile.GlobalIdentifier - firstGlobal;
+
+          TiledMapTilesetTile tileDefinition = tileSet.Tiles.FirstOrDefault(t => t.LocalTileIdentifier == localTileId);
+          if (tileDefinition != null) {
+            foreach (TiledMapObject collisionObject in tileDefinition.Objects) {
+              float worldX = x * TiledMap.TileWidth + collisionObject.Position.X;
+              float worldY = y * TiledMap.TileHeight + collisionObject.Position.Y;
+              var rect = new RectangleF(worldX, worldY, collisionObject.Size.Width, collisionObject.Size.Height);
+
+              if (collisionObject.Properties.TryGetValue("tag", out string tag)) {
+                if (tag == "water") {
+                  WaterRectangles.Add(rect);
+                }
+                else if (tag == "solid") {
+                  CollisionRectangles.Add(rect);
+                }
+                else if (tag == "no walls") {
+                  CollisionRectangles.Add(rect);
+                  NoWallRectangles.Add(rect);
+                }
+              }
+              else {
+                CollisionRectangles.Add(rect);
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -71,6 +140,7 @@ public class TilemapManager(Game game) {
   public void UnloadMap() {
     CollisionRectangles?.Clear();
     WaterRectangles?.Clear();
+    NoWallRectangles?.Clear();
 
     TiledMapRenderer?.Dispose();
     TiledMapRenderer = null;

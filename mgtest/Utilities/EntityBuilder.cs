@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using mgtest.Entities;
 using mgtest.Managers;
 using Microsoft.Xna.Framework;
@@ -27,6 +28,8 @@ public static class EntityBuilder {
       else if (obj.Properties.ContainsKey("type")) {
         objType = obj.Properties["type"].ToString().ToLower();
       }
+
+      Console.WriteLine($"We have a {objType} entity!");
 
       // Create object position
       var position = new Vector2(obj.Position.X, obj.Position.Y - obj.Size.Height);

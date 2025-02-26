@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Audio;
 namespace mgtest.Utilities;
 
 public class SfxManager {
-  private readonly Dictionary<Sfx, SoundEffect> _sounds = new();
+  private readonly Dictionary<Sfx, SoundEffect> _sounds = [];
 
   public void LoadSounds(Game game) {
     _sounds[Sfx.Jump] = game.Content.Load<SoundEffect>("sfx/jump");

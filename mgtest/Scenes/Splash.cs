@@ -6,7 +6,7 @@ using MonoGame.Extended.Tiled.Renderers;
 
 namespace mgtest.Scenes;
 
-public class Splash : Scene {
+public class Splash : BaseScene {
   private int _displayedTime;
   private TiledMap _tiledMap;
   private TiledMapRenderer _tiledMapRenderer;
@@ -15,6 +15,9 @@ public class Splash : Scene {
   }
 
   public override void LoadContent() {
+    // Optionally load common content if needed.
+    LoadCommonContent();
+
     _tiledMap = Game.Content.Load<TiledMap>("levels/splash");
     _tiledMapRenderer = new TiledMapRenderer(Game.GraphicsDevice, _tiledMap);
   }

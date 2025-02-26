@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using mgtest.Abstracts;
 using mgtest.Components;
 using mgtest.Entities;
@@ -9,126 +8,61 @@ using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
-using MonoGame.Extended.Tiled;
 
 namespace mgtest.Scenes;
 
-public class Playground : Scene {
-  // Components
-  private Song _musicPlayer;
-  private Entity _playerEntity;
-  private List<Entity> _entities;
-  private Camera _camera;
-  private TilemapManager _tilemapManager;
-  private readonly SfxManager _sfxManager;
-  private readonly InputManager _inputManager;
+public class Playground : GameScene {
+  // Fade settings for music.
+  private const float FadeDuration = 5.0f;
+  private const float TargetVolume = 1.0f;
 
-  // Lifecycle
   public Playground(Game1 game) : base(game) {
-    _tilemapManager = new TilemapManager(Game);
-    _sfxManager = new SfxManager();
-    _inputManager = new InputManager();
-
     MediaPlayer.IsRepeating = true;
   }
 
   public override void LoadContent() {
-    _sfxManager.LoadSounds(Game);
-    _tilemapManager.LoadMap(Map.Playground);
-    _camera = new Camera(Game.GraphicsDevice);
-    _musicPlayer = Game.Content.Load<Song>("music/one");
-    _entities = new List<Entity>();
-
-    TiledMapObjectLayer entityLayer = _tilemapManager.GetLayer(MapLayer.Entities);
-    EntityBuilder.LoadEntities(
-      entityLayer,
-      _entities,
-      ref _playerEntity,
-      Game.Content,
-      _tilemapManager,
-      _sfxManager,
-      _inputManager
-    );
-
-    MediaPlayer.Play(_musicPlayer);
+    LoadCommonContent();
+    LoadGameContent(Map.Playground, "music/one");
   }
 
   public override void UnloadContent() {
-    _playerEntity = null;
-    _entities?.Clear();
-    _camera = null;
-    _tilemapManager = null;
-    _musicPlayer = null;
+    Player = null;
+    Entities.Clear();
+    TilemapManager = null;
   }
 
   public override void Update(GameTime gameTime) {
-    _inputManager.Update(gameTime);
+    var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+    MediaPlayer.Volume = AudioUtilities.UpdateVolume(MediaPlayer.Volume, TargetVolume, FadeDuration, dt);
 
-    _tilemapManager.Update(gameTime);
-    foreach (Entity entity in _entities) {
-      entity.Update(gameTime);
-    }
+    InputManager.Update(gameTime);
 
-    // Collision detection between player and coin entities.
-    var playerCollider = _playerEntity.GetComponent<Collider>();
+    // --- Coin Collision Detection ---
+    var playerCollider = Player?.GetComponent<Collider>();
     if (playerCollider != null) {
-      foreach (Entity entity in new List<Entity>(_entities)) {
-        if (entity == _playerEntity) {
+      // Iterate over a copy so we can modify the Entities list.
+      foreach (Entity entity in new List<Entity>(Entities)) {
+        if (entity == Player) {
           continue;
         }
 
         var coinCollider = entity.GetComponent<Collider>();
         if (coinCollider != null && playerCollider.Bounds.Intersects(coinCollider.Bounds)) {
-          // If the colliding entity is a coin, remove it and play a sound.
           if (entity is CoinEntity) {
-            _entities.Remove(entity);
-            _sfxManager.PlaySound(Sfx.Collect);
+            Entities.Remove(entity);
+            SfxManager.PlaySound(Sfx.Collect);
           }
         }
       }
     }
 
-    if (_playerEntity != null) {
-      _camera.Update(_playerEntity.Position, _tilemapManager.TiledMap);
-    }
+
+    base.Update(gameTime);
   }
 
   public override void Draw(SpriteBatch spriteBatch) {
-    // Save original layer visibilities.
-    var originalVisibilities = new Dictionary<string, bool>();
-
-    foreach (TiledMapLayer layer in _tilemapManager.TiledMap.Layers) {
-      originalVisibilities[layer.Name] = layer.IsVisible;
-
-      if (layer.Name.Equals("Foreground", StringComparison.OrdinalIgnoreCase)) {
-        layer.IsVisible = false;
-      }
-    }
-
-    // Draw background and main layers.
-    _tilemapManager.TiledMapRenderer.Draw(_camera.Transform);
-
-    // Draw entities.
-    spriteBatch.Begin(transformMatrix: _camera.Transform);
-    foreach (Entity entity in _entities) {
-      entity.Draw(spriteBatch);
-    }
-
-    spriteBatch.End();
-
-    // Draw the foreground layer with point filtering.
-    foreach (TiledMapLayer layer in _tilemapManager.TiledMap.Layers) {
-      layer.IsVisible = layer.Name.Equals("Foreground", StringComparison.OrdinalIgnoreCase);
-    }
-
-    Game.GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
-    _tilemapManager.TiledMapRenderer.Draw(_camera.Transform);
-
-    // Restore original visibilities.
-    foreach (TiledMapLayer layer in _tilemapManager.TiledMap.Layers) {
-      if (originalVisibilities.ContainsKey(layer.Name)) {
-        layer.IsVisible = originalVisibilities[layer.Name];
-      }
-    }
+    // Call base draw to render the tilemap and entities.
+    base.Draw(spriteBatch);
+    // Add any additional Playground-specific drawing here.
   }
 }
