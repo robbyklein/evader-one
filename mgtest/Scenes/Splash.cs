@@ -1,23 +1,24 @@
 ﻿using mgtest.Abstracts;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 
 namespace mgtest.Scenes;
 
-public class Splash : BaseScene {
+public class Splash : Scene {
   private int _displayedTime;
   private TiledMap _tiledMap;
   private TiledMapRenderer _tiledMapRenderer;
+  private Song _splashSong;
+  private bool _playing;
 
   public Splash(Game1 game) : base(game) {
   }
 
   public override void LoadContent() {
-    // Optionally load common content if needed.
-    LoadCommonContent();
-
+    _splashSong = Game.Content.Load<Song>("music/splash");
     _tiledMap = Game.Content.Load<TiledMap>("levels/splash");
     _tiledMapRenderer = new TiledMapRenderer(Game.GraphicsDevice, _tiledMap);
   }
@@ -30,7 +31,14 @@ public class Splash : BaseScene {
   public override void Update(GameTime gameTime) {
     _tiledMapRenderer.Update(gameTime);
 
-    if (_displayedTime > 2000) {
+    // Play the splash song once right after fade-in is complete.
+    if (!_playing && !Game.SceneManager.IsTransitionActive) {
+      MediaPlayer.Play(_splashSong);
+      _playing = true;
+    }
+
+    // Transition to the Title scene after a set display time.
+    if (_displayedTime > 3000) {
       Game.SceneManager.ChangeScene(new Title(Game));
     }
 

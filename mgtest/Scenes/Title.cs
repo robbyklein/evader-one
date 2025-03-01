@@ -23,10 +23,9 @@ public class Title : GameScene {
   }
 
   public override void LoadContent() {
-    LoadCommonContent();
-
-    LoadGameContent(Map.Title, "music/title");
-
+    // Use the updated base GameScene load method which loads the tilemap,
+    // entities (including the player) and audio.
+    base.LoadContent(Map.Title, "music/title");
     MediaPlayer.Volume = 0.0f;
   }
 
@@ -43,12 +42,11 @@ public class Title : GameScene {
       _showPressStart = !_showPressStart;
     }
 
-    // Update common game content.
+    // Update common game logic (tilemap, entities, camera, collision checks).
     base.Update(gameTime);
 
-    // Check input for starting the game.
+    // Process title-specific input.
     InputManager.Update(gameTime);
-
     if (InputManager.IsActionPressed(InputAction.Start)) {
       SfxManager.PlaySound(Sfx.Collect);
       Game.SceneManager.ChangeScene(new Playground(Game));
@@ -56,10 +54,10 @@ public class Title : GameScene {
   }
 
   public override void Draw(SpriteBatch spriteBatch) {
-    // First, let the base class draw the tilemap and entities.
+    // Draw common content: tilemap and entities.
     base.Draw(spriteBatch);
 
-    // Then draw title-specific UI on top (like blinking "PRESS START!").
+    // Draw title-specific UI on top (blinking "PRESS START!").
     spriteBatch.Begin(transformMatrix: Camera.Transform);
     if (_showPressStart) {
       BitmapFont.DrawString(spriteBatch, "PRESS START!", new Vector2(114, 76), Color.White);

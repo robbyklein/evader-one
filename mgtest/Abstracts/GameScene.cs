@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using mgtest.Components;
 using mgtest.Entities;
 using mgtest.Managers;
+using mgtest.Types;
 using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,19 +12,20 @@ using MonoGame.Extended.Tiled;
 
 namespace mgtest.Abstracts;
 
-public abstract class GameScene : BaseScene {
+public abstract class GameScene : Scene {
   protected List<Entity> Entities = new();
   protected Entity Player;
 
   protected GameScene(Game1 game) : base(game) {
   }
 
-  protected virtual void LoadGameContent(Map map, string songAsset) {
+  // Overload to load scene-specific content.
+  protected virtual void LoadContent(Map map, string songAsset) {
+    base.LoadContent();
     TilemapManager.LoadMap(map);
     BackgroundSong = Game.Content.Load<Song>(songAsset);
 
     TiledMapObjectLayer entityLayer = TilemapManager.GetLayer(MapLayer.Entities);
-
     EntityBuilder.LoadEntities(
       entityLayer,
       Entities,
@@ -47,6 +50,32 @@ public abstract class GameScene : BaseScene {
     if (Player != null) {
       Camera.Update(Player.Position, TilemapManager.TiledMap);
     }
+
+    // Perform collision checks (e.g. coin collisions)
+    CheckCoinCollisions();
+  }
+
+  /// <summary>
+  ///   Checks for collisions between the player and coin entities.
+  /// </summary>
+  protected virtual void CheckCoinCollisions() {
+    var playerCollider = Player?.GetComponent<Collider>();
+    if (playerCollider != null) {
+      // Iterate over a copy so that we can modify Entities safely.
+      foreach (Entity entity in new List<Entity>(Entities)) {
+        if (entity == Player) {
+          continue;
+        }
+
+        var coinCollider = entity.GetComponent<Collider>();
+        if (coinCollider != null && playerCollider.Bounds.Intersects(coinCollider.Bounds)) {
+          if (entity is CoinEntity) {
+            Entities.Remove(entity);
+            SfxManager.PlaySound(Sfx.Collect);
+          }
+        }
+      }
+    }
   }
 
   public override void Draw(SpriteBatch spriteBatch) {
@@ -54,7 +83,6 @@ public abstract class GameScene : BaseScene {
     var originalVisibilities = new Dictionary<string, bool>();
     foreach (TiledMapLayer layer in TilemapManager.TiledMap.Layers) {
       originalVisibilities[layer.Name] = layer.IsVisible;
-      // Hide foreground during background draw.
       if (layer.Name.Equals("Foreground", StringComparison.OrdinalIgnoreCase)) {
         layer.IsVisible = false;
       }
@@ -81,8 +109,8 @@ public abstract class GameScene : BaseScene {
 
     // Restore original visibilities.
     foreach (TiledMapLayer layer in TilemapManager.TiledMap.Layers) {
-      if (originalVisibilities.ContainsKey(layer.Name)) {
-        layer.IsVisible = originalVisibilities[layer.Name];
+      if (originalVisibilities.TryGetValue(layer.Name, out bool isVisible)) {
+        layer.IsVisible = isVisible;
       }
     }
   }
