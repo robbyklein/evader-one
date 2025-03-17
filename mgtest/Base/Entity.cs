@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using mgtest.Interfaces;
+using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -36,5 +37,11 @@ public class Entity {
     foreach (IComponent comp in _components) {
       comp.Draw(spriteBatch);
     }
+  }
+
+  public virtual void OnCollision(Entity other) {
+  }
+
+  public virtual void OnCollision(Entity other, SfxManager sfxManager, List<Entity> entities) {
   }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using mgtest.Components;
+using mgtest.Data;
 using mgtest.Types;
+using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -32,5 +34,13 @@ public class CoinEntity : Entity {
 
     var animationComponent = new SpriteAnimator(this, spriteSheet, _animations, new NullPhysics());
     AddComponent(animationComponent);
+  }
+
+  public override void OnCollision(Entity other, SfxManager sfxManager, List<Entity> entities) {
+    if (other is PlayerEntity) {
+      sfxManager.PlaySound(Sfx.Collect);
+      GameData.Coins++;
+      entities.Remove(this);
+    }
   }
 }

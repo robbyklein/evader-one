@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using mgtest.Abstracts;
 using mgtest.Config;
 using mgtest.Data;
 using Microsoft.Xna.Framework;
@@ -8,6 +9,7 @@ namespace mgtest.Entities;
 
 public class LevelHud {
   private readonly Game1 _game;
+  private readonly LevelScene _scene;
   private readonly Texture2D _hudSprites;
   private readonly Dictionary<int, Rectangle> _digitTiles = new();
 
@@ -20,11 +22,9 @@ public class LevelHud {
   private readonly Rectangle _dividerTile = new(0, 16, 8, 8);
   private readonly Rectangle _hyphenTile = new(8, 16, 8, 8);
 
-  private int _time = 300;
-  private float _timeAccumulator;
-
-  public LevelHud(Game1 game) {
+  public LevelHud(Game1 game, LevelScene scene) {
     _game = game;
+    _scene = scene;
     _hudSprites = game.Content.Load<Texture2D>("sprites/hud");
 
     for (var i = 0; i < 8; i++) {
@@ -36,14 +36,6 @@ public class LevelHud {
   }
 
   public void Update(GameTime gameTime) {
-    _timeAccumulator += (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-    while (_timeAccumulator >= 1f) {
-      _timeAccumulator -= 1f;
-      if (_time > 0) {
-        _time--;
-      }
-    }
   }
 
   public void Draw(SpriteBatch spriteBatch) {
@@ -75,7 +67,7 @@ public class LevelHud {
 
     // Time
     spriteBatch.Draw(_hudSprites, new Vector2(35 * Settings.TileSize, 0), _timeTile, Color.White);
-    DrawNumber(spriteBatch, _time, new Vector2(36 * Settings.TileSize, 0), 3);
+    DrawNumber(spriteBatch, _scene.Time, new Vector2(36 * Settings.TileSize, 0), 3);
 
     spriteBatch.End();
   }

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using mgtest.Components;
-using mgtest.Data;
 using mgtest.Entities;
 using mgtest.Managers;
-using mgtest.Types;
 using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,14 +11,11 @@ using MonoGame.Extended.Tiled;
 
 namespace mgtest.Abstracts;
 
-public abstract class GameScene : Scene {
+public abstract class GameScene(Game1 game) : Scene(game) {
+  // State
   protected List<Entity> Entities = new();
   protected Entity Player;
 
-  protected GameScene(Game1 game) : base(game) {
-  }
-
-  // Overload to load scene-specific content.
   protected virtual void LoadContent(Map map, string songAsset) {
     base.LoadContent();
     TilemapManager.LoadMap(map);
@@ -53,32 +48,28 @@ public abstract class GameScene : Scene {
     }
 
     // Perform collision checks (e.g. coin collisions)
-    CheckCoinCollisions();
+    CheckCollisions();
   }
 
-  /// <summary>
-  ///   Checks for collisions between the player and coin entities.
-  /// </summary>
-  protected virtual void CheckCoinCollisions() {
+  protected virtual void CheckCollisions() {
     var playerCollider = Player?.GetComponent<Collider>();
-    if (playerCollider != null) {
-      // Iterate over a copy so that we can modify Entities safely.
-      foreach (Entity entity in new List<Entity>(Entities)) {
-        if (entity == Player) {
-          continue;
-        }
+    if (playerCollider == null) {
+      return;
+    }
 
-        var coinCollider = entity.GetComponent<Collider>();
-        if (coinCollider != null && playerCollider.Bounds.Intersects(coinCollider.Bounds)) {
-          if (entity is CoinEntity) {
-            Entities.Remove(entity);
-            SfxManager.PlaySound(Sfx.Collect);
-            GameData.Coins++;
-          }
-        }
+    foreach (Entity entity in new List<Entity>(Entities)) {
+      if (entity == Player) {
+        continue;
+      }
+
+      var entityCollider = entity.GetComponent<Collider>();
+      if (entityCollider != null && playerCollider.Bounds.Intersects(entityCollider.Bounds)) {
+        entity.OnCollision(Player, SfxManager, Entities);
+        Player.OnCollision(entity, SfxManager, Entities);
       }
     }
   }
+
 
   public override void Draw(SpriteBatch spriteBatch) {
     // Save original layer visibilities.
