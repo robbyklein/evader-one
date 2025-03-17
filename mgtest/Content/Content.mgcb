@@ -96,6 +96,18 @@
 /processorParam:TextureFormat=Color
 /build:sprites/characters.png
 
+#begin sprites/hud.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:sprites/hud.png
+
 #begin sprites/items.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -203,6 +215,11 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:sprites/water.png
+
+#begin tilesets/Hud.tsx
+/importer:TiledMapTilesetImporter
+/processor:TiledMapTilesetProcessor
+/build:tilesets/Hud.tsx
 
 #begin tilesets/Items.tsx
 /importer:TiledMapTilesetImporter

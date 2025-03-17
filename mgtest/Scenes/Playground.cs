@@ -20,7 +20,7 @@ public class Playground : GameScene {
 
   public override void LoadContent() {
     base.LoadContent(Map.Playground, "music/one");
-    _hud = new LevelHud(Game, BitmapFont);
+    _hud = new LevelHud(Game);
   }
 
   public override void UnloadContent() {

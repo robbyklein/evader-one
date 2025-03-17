@@ -28,9 +28,7 @@ public static class EntityBuilder {
       else if (obj.Properties.ContainsKey("type")) {
         objType = obj.Properties["type"].ToString().ToLower();
       }
-
-      Console.WriteLine($"We have a {objType} entity!");
-
+      
       // Create object position
       var position = new Vector2(obj.Position.X, obj.Position.Y - obj.Size.Height);
 

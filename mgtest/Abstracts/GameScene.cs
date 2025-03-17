@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using mgtest.Components;
+using mgtest.Data;
 using mgtest.Entities;
 using mgtest.Managers;
 using mgtest.Types;
@@ -72,6 +73,7 @@ public abstract class GameScene : Scene {
           if (entity is CoinEntity) {
             Entities.Remove(entity);
             SfxManager.PlaySound(Sfx.Collect);
+            GameData.Coins++;
           }
         }
       }
