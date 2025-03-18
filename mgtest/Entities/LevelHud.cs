@@ -53,7 +53,7 @@ public class LevelHud {
 
     // Stage
     spriteBatch.Draw(_hudSprites, new Vector2(Settings.TileSize * 6, 0), _worldTile, Color.White);
-    DrawNumber(spriteBatch, GameData.World, new Vector2(Settings.TileSize * 7, 0));
+    DrawNumber(spriteBatch, GameData.World, new Vector2(Settings.TileSize * 7, 0), 0, false);
     spriteBatch.Draw(_hudSprites, new Vector2(Settings.TileSize * 8, 0), _hyphenTile, Color.White);
     DrawNumber(spriteBatch, GameData.Level, new Vector2(Settings.TileSize * 9, 0), 0, false);
 

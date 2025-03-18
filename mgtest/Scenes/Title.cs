@@ -49,7 +49,7 @@ public class Title : GameScene {
     InputManager.Update(gameTime);
     if (InputManager.IsActionPressed(InputAction.Start)) {
       SfxManager.PlaySound(Sfx.Collect);
-      Game.SceneManager.ChangeScene(new Playground(Game));
+      Game.SceneManager.ChangeScene(new LevelDisplay(Game));
     }
   }
 

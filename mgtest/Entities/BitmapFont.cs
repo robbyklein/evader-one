@@ -7,7 +7,7 @@ public class BitmapFont {
   private const int TileWidth = 8;
   private const int TileHeight = 8;
   private const int Columns = 12;
-  private static readonly string FontChars = " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.,:?!";
+  private static readonly string FontChars = " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.,:?!xxx()&#+-";
 
   private readonly Texture2D _texture;
   private readonly Dictionary<char, int> _charMap = new();

@@ -7,13 +7,13 @@
     "expandedProjectPaths": [
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels",
         "C:/Users/hello/Developer/mgtest/mgtest",
-        "C:/Users/hello/Developer/mgtest",
-        "mgtest/Content",
-        "C:/Users/hello/Developer/mgtest/mgtest/obj",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets",
         "mgtest/Content/tilesets",
-        "."
+        ".",
+        "C:/Users/hello/Developer/mgtest/mgtest/obj",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content",
+        "mgtest/Content",
+        "C:/Users/hello/Developer/mgtest"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -29,7 +29,7 @@
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 17.125,
-                "y": -6.5
+                "y": 216.25
             }
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/splash.tmx": {

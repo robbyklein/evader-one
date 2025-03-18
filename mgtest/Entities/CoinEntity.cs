@@ -40,6 +40,7 @@ public class CoinEntity : Entity {
     if (other is PlayerEntity) {
       sfxManager.PlaySound(Sfx.Collect);
       GameData.Coins++;
+      GameData.Points += 1000;
       entities.Remove(this);
     }
   }
