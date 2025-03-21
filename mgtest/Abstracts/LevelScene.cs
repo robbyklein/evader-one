@@ -11,10 +11,11 @@ public class LevelScene : GameScene {
   // Dependencies
   private LevelHud _hud;
 
-  public int Time = 5;
+  public int Time = 300;
   private float _timeAccumulator;
 
-  public LevelScene(Game1 game) : base(game) {
+  public LevelScene(Game1 game, int time) : base(game) {
+    Time = time;
   }
 
   protected override void LoadContent(Map map, string songAsset) {

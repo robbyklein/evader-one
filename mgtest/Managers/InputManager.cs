@@ -16,6 +16,8 @@ public class InputManager {
 
   public InputManager() {
     // Setup keyboard mappings
+    _keyboardMappings[InputAction.MoveDown] = new List<Keys> { Keys.S, Keys.Down };
+    _keyboardMappings[InputAction.MoveUp] = new List<Keys> { Keys.W, Keys.Up };
     _keyboardMappings[InputAction.MoveLeft] = new List<Keys> { Keys.A, Keys.Left };
     _keyboardMappings[InputAction.MoveRight] = new List<Keys> { Keys.D, Keys.Right };
     _keyboardMappings[InputAction.Jump] = new List<Keys> { Keys.Space, Keys.W, Keys.Up };
@@ -23,6 +25,8 @@ public class InputManager {
 
 
     // Setup gamepad mappings
+    _gamepadMappings[InputAction.MoveUp] = new List<Buttons> { Buttons.DPadUp, Buttons.LeftThumbstickUp };
+    _gamepadMappings[InputAction.MoveDown] = new List<Buttons> { Buttons.DPadDown, Buttons.LeftThumbstickDown };
     _gamepadMappings[InputAction.MoveLeft] = new List<Buttons> { Buttons.DPadLeft, Buttons.LeftThumbstickLeft };
     _gamepadMappings[InputAction.MoveRight] = new List<Buttons> { Buttons.DPadRight, Buttons.LeftThumbstickRight };
     _gamepadMappings[InputAction.Jump] = new List<Buttons> { Buttons.A };

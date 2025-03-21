@@ -23,8 +23,6 @@ public class Title : GameScene {
   }
 
   public override void LoadContent() {
-    // Use the updated base GameScene load method which loads the tilemap,
-    // entities (including the player) and audio.
     base.LoadContent(Map.Title, "music/title");
     MediaPlayer.Volume = 0.0f;
   }
@@ -35,6 +33,15 @@ public class Title : GameScene {
     // Fade in music.
     MediaPlayer.Volume = AudioUtilities.UpdateVolume(MediaPlayer.Volume, TargetVolume, FadeDuration, dt);
 
+    // Check for start press
+    InputManager.Update(gameTime);
+
+
+    if (InputManager.IsActionPressed(InputAction.Start)) {
+      Game.SceneManager.ChangeScene(new Difficulty(Game));
+    }
+
+
     // Update blink timer for "PRESS START!" text.
     _blinkTimer += dt;
     if (_blinkTimer >= BlinkInterval) {
@@ -44,13 +51,6 @@ public class Title : GameScene {
 
     // Update common game logic (tilemap, entities, camera, collision checks).
     base.Update(gameTime);
-
-    // Process title-specific input.
-    InputManager.Update(gameTime);
-    if (InputManager.IsActionPressed(InputAction.Start)) {
-      SfxManager.PlaySound(Sfx.Collect);
-      Game.SceneManager.ChangeScene(new LevelDisplay(Game));
-    }
   }
 
   public override void Draw(SpriteBatch spriteBatch) {

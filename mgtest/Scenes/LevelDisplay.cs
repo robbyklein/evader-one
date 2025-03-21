@@ -13,7 +13,7 @@ public class LevelDisplay(Game1 game) : Scene(game) {
 
     _elapsedTime += gameTime.ElapsedGameTime.TotalSeconds;
 
-    if (_elapsedTime >= 5) {
+    if (_elapsedTime >= 3) {
       Game.SceneManager.ChangeScene(new Playground(Game));
       _elapsedTime = -1;
     }
