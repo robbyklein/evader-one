@@ -1,5 +1,4 @@
 ﻿using mgtest.Abstracts;
-using mgtest.Managers;
 using mgtest.Types;
 using mgtest.Utilities;
 using Microsoft.Xna.Framework;
@@ -23,7 +22,7 @@ public class Title : GameScene {
   }
 
   public override void LoadContent() {
-    base.LoadContent(Map.Title, "music/title");
+    base.LoadContent("levels/title", "music/title");
     MediaPlayer.Volume = 0.0f;
   }
 

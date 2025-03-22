@@ -1,27 +1,21 @@
 ﻿using mgtest.Data;
 using mgtest.Entities;
-using mgtest.Managers;
 using mgtest.Scenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace mgtest.Abstracts;
 
-public class LevelScene : GameScene {
+public class LevelScene(Game1 game, string levelString) : GameScene(game) {
   // Dependencies
   private LevelHud _hud;
 
-  public int Time = 300;
+  public LevelInfo LevelInfo = LevelData.GetLevelInfo(levelString, GameData.Difficulty.ToString());
   private float _timeAccumulator;
   private int _startTime;
 
-  public LevelScene(Game1 game, int time) : base(game) {
-    Time = time;
-  }
-
-  protected override void LoadContent(Map map, string songAsset) {
-    base.LoadContent(map, songAsset);
-
+  protected override void LoadContent(string mapAsset, string songAsset) {
+    base.LoadContent(mapAsset, songAsset);
     _hud = new LevelHud(Game, this);
   }
 
@@ -51,11 +45,11 @@ public class LevelScene : GameScene {
 
     while (_timeAccumulator >= 1f) {
       _timeAccumulator -= 1f;
-      if (Time > 1) {
-        Time--;
+      if (LevelInfo.Time > 1) {
+        LevelInfo.Time--;
       }
       else {
-        Time--;
+        LevelInfo.Time--;
         GameData.Lifes--;
 
         if (GameData.Lifes > 0) {

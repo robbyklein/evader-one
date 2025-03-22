@@ -42,19 +42,8 @@ public class TilemapManager {
     TiledMapRenderer?.Draw();
   }
 
-  public void LoadMap(Map map) {
-    switch (map) {
-      case Map.Splash:
-        TiledMap = game.Content.Load<TiledMap>("levels/splash");
-        break;
-      case Map.Playground:
-        TiledMap = game.Content.Load<TiledMap>("levels/playground");
-        break;
-      case Map.Title:
-        TiledMap = game.Content.Load<TiledMap>("levels/title");
-        break;
-    }
-
+  public void LoadMap(string mapAsset) {
+    TiledMap = game.Content.Load<TiledMap>(mapAsset);
     TiledMapRenderer = new TiledMapRenderer(game.GraphicsDevice, TiledMap);
     LoadHybridCollisions();
   }

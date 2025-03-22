@@ -1,5 +1,4 @@
 ﻿using mgtest.Abstracts;
-using mgtest.Managers;
 using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,12 +11,12 @@ public class Playground : LevelScene {
   private const float FadeDuration = 5.0f;
   private const float TargetVolume = 1.0f;
 
-  public Playground(Game1 game) : base(game, 300) {
+  public Playground(Game1 game) : base(game, "1-1") {
     MediaPlayer.IsRepeating = true;
   }
 
   public override void LoadContent() {
-    base.LoadContent(Map.Playground, "music/one");
+    base.LoadContent(LevelInfo.Tilemap, LevelInfo.SongAsset);
   }
 
   public override void UnloadContent() {

@@ -2,7 +2,6 @@
 using mgtest.Abstracts;
 using mgtest.Config;
 using mgtest.Data;
-using mgtest.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -40,22 +39,8 @@ public class LevelHud {
   public void Update(GameTime gameTime) {
   }
 
-  private LevelDifficultyData GetDifficultyData() {
-    var levelString = $"{GameData.World}-{GameData.Level}";
-
-    switch (GameData.Difficulty) {
-      case GameDifficulty.Easy:
-        return LevelData.GetLevel(levelString).Easy;
-      case GameDifficulty.Hard:
-        return LevelData.GetLevel(levelString).Hard;
-      default:
-        return LevelData.GetLevel(levelString).Normal;
-    }
-  }
 
   public void Draw(SpriteBatch spriteBatch) {
-    LevelDifficultyData req = GetDifficultyData();
-
     spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
     // Render base
@@ -68,7 +53,7 @@ public class LevelHud {
     spriteBatch.Draw(_hudSprites, new Vector2(Settings.TileSize * 1, 0), _coinTile, Color.White);
     DrawNumber(spriteBatch, GameData.Coins, new Vector2(Settings.TileSize * 2, 0), 0, false);
     spriteBatch.Draw(_hudSprites, new Vector2(Settings.TileSize * 3, 0), _slashTile, Color.White);
-    DrawNumber(spriteBatch, req.Coins, new Vector2(Settings.TileSize * 4, 0), 0, false);
+    DrawNumber(spriteBatch, _scene.LevelInfo.Coins, new Vector2(Settings.TileSize * 4, 0), 0, false);
 
     // Stage
     spriteBatch.Draw(_hudSprites, new Vector2(Settings.TileSize * 6, 0), _worldTile, Color.White);
@@ -86,7 +71,7 @@ public class LevelHud {
 
     // Time
     spriteBatch.Draw(_hudSprites, new Vector2(35 * Settings.TileSize, 0), _timeTile, Color.White);
-    DrawNumber(spriteBatch, _scene.Time, new Vector2(36 * Settings.TileSize, 0), 3);
+    DrawNumber(spriteBatch, _scene.LevelInfo.Time, new Vector2(36 * Settings.TileSize, 0), 3);
 
     spriteBatch.End();
   }
