@@ -6,14 +6,14 @@
     "activeFile": "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx",
     "expandedProjectPaths": [
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels",
-        "C:/Users/hello/Developer/mgtest/mgtest",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets",
-        "mgtest/Content/tilesets",
-        ".",
-        "C:/Users/hello/Developer/mgtest/mgtest/obj",
         "C:/Users/hello/Developer/mgtest/mgtest/Content",
+        "mgtest/Content/tilesets",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets",
+        ".",
         "mgtest/Content",
-        "C:/Users/hello/Developer/mgtest"
+        "C:/Users/hello/Developer/mgtest/mgtest/obj",
+        "C:/Users/hello/Developer/mgtest",
+        "C:/Users/hello/Developer/mgtest/mgtest"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -25,11 +25,11 @@
             "expandedObjectLayers": [
                 3
             ],
-            "scale": 4,
-            "selectedLayer": 3,
+            "scale": 3,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 17.125,
-                "y": 216.25
+                "x": 351.16666666666663,
+                "y": 44
             }
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/splash.tmx": {

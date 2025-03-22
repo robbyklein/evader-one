@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using mgtest.Components;
+using mgtest.Data;
 using mgtest.Entities;
 using mgtest.Managers;
 using mgtest.Utilities;
@@ -39,13 +40,18 @@ public abstract class GameScene(Game1 game) : Scene(game) {
   public override void Update(GameTime gameTime) {
     TilemapManager.Update(gameTime);
 
+    if (Player != null) {
+      Camera.Update(Player.Position, TilemapManager.TiledMap);
+    }
+
+    if (GameData.GameFinished || !GameData.GameStarted) {
+      return;
+    }
+
     foreach (Entity entity in Entities) {
       entity.Update(gameTime);
     }
 
-    if (Player != null) {
-      Camera.Update(Player.Position, TilemapManager.TiledMap);
-    }
 
     // Perform collision checks (e.g. coin collisions)
     CheckCollisions();

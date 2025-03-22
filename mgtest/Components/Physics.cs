@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using mgtest.Data;
 using mgtest.Entities;
 using mgtest.Interfaces;
 using mgtest.Types;
@@ -42,16 +43,18 @@ public class Physics : IPhysics {
   private readonly List<RectangleF> waterRects;
   private readonly List<RectangleF> noWallRects;
   private readonly Collider collider;
+  private readonly RectangleF finishRect;
 
   // Updated constructor now includes noWallRects.
   public Physics(Entity owner, SfxManager sfxManager, List<RectangleF> collisionRects, List<RectangleF> waterRects,
-    List<RectangleF> noWallRects, Collider collider) {
+    List<RectangleF> noWallRects, Collider collider, RectangleF finishRect) {
     this.owner = owner;
     this.sfxManager = sfxManager;
     this.collisionRects = collisionRects;
     this.waterRects = waterRects;
     this.noWallRects = noWallRects;
     this.collider = collider;
+    this.finishRect = finishRect;
   }
 
   // Lifecycle
@@ -64,6 +67,13 @@ public class Physics : IPhysics {
     ApplyJump();
     ApplyMovement(dt);
     UpdateGrounded();
+    CheckFinish();
+  }
+
+  public void CheckFinish() {
+    if (IsInFinish()) {
+      GameData.GameFinished = true;
+    }
   }
 
   public void Draw(SpriteBatch spriteBatch) {
@@ -279,6 +289,16 @@ public class Physics : IPhysics {
       if (playerRect.Intersects(waterRect)) {
         return true;
       }
+    }
+
+    return false;
+  }
+
+  private bool IsInFinish() {
+    RectangleF playerRect = collider.Bounds;
+
+    if (playerRect.Intersects(finishRect)) {
+      return true;
     }
 
     return false;

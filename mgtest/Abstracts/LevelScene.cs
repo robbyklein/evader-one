@@ -13,6 +13,7 @@ public class LevelScene : GameScene {
 
   public int Time = 300;
   private float _timeAccumulator;
+  private int _startTime;
 
   public LevelScene(Game1 game, int time) : base(game) {
     Time = time;
@@ -24,8 +25,27 @@ public class LevelScene : GameScene {
     _hud = new LevelHud(Game, this);
   }
 
+  private void StartRoutine(GameTime gameTime) {
+    if (GameData.GameStarted) {
+      return;
+    }
+
+    if (_startTime > 3000) {
+      GameData.GameStarted = true;
+    }
+
+    _startTime += gameTime.ElapsedGameTime.Milliseconds;
+  }
+
+
   public override void Update(GameTime gameTime) {
     base.Update(gameTime);
+
+    StartRoutine(gameTime);
+
+    if (GameData.GameFinished || !GameData.GameStarted) {
+      return;
+    }
 
     _timeAccumulator += (float)gameTime.ElapsedGameTime.TotalSeconds;
 

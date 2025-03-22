@@ -3,6 +3,8 @@
 namespace mgtest.Data;
 
 public static class GameData {
+  public static bool GameStarted = false;
+  public static bool GameFinished = false;
   public static int Points;
   public static int Lifes = 3;
   public static int Coins;

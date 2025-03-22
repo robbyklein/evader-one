@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="120" height="24" tilewidth="8" tileheight="8" infinite="0" backgroundcolor="#000000" nextlayerid="5" nextobjectid="26">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="120" height="24" tilewidth="8" tileheight="8" infinite="0" backgroundcolor="#000000" nextlayerid="5" nextobjectid="27">
  <tileset firstgid="1" source="../tilesets/Tileset.tsx"/>
  <tileset firstgid="71" source="../tilesets/Underground.tsx"/>
  <tileset firstgid="1189" source="../tilesets/Water.tsx"/>
@@ -42,6 +42,11 @@
   <object id="25" x="0" y="15" width="1" height="50">
    <properties>
     <property name="tag" value="no walls"/>
+   </properties>
+  </object>
+  <object id="26" x="309" y="8" width="90" height="64">
+   <properties>
+    <property name="tag" value="finish"/>
    </properties>
   </object>
  </objectgroup>

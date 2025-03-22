@@ -26,11 +26,9 @@ public class TilemapManager {
   public TiledMap TiledMap;
   public TiledMapRenderer TiledMapRenderer;
   public List<RectangleF> CollisionRectangles { get; private set; }
-
   public List<RectangleF> WaterRectangles { get; private set; }
-
-  // New list to hold objects that should not count as walls for wall jumping.
   public List<RectangleF> NoWallRectangles { get; private set; }
+  public RectangleF FinishRectangle { get; private set; }
 
   public TilemapManager(Game game) {
     this.game = game;
@@ -83,6 +81,9 @@ public class TilemapManager {
             // Collide normally but ignore for wall jumping.
             CollisionRectangles.Add(rect);
             NoWallRectangles.Add(rect);
+          }
+          else if (tag == "finish") {
+            FinishRectangle = rect;
           }
         }
         else {

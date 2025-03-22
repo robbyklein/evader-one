@@ -58,7 +58,8 @@ public class PlayerEntity : Entity {
       tilemapManager.CollisionRectangles,
       tilemapManager.WaterRectangles,
       tilemapManager.NoWallRectangles,
-      collider
+      collider,
+      tilemapManager.FinishRectangle
     );
     AddComponent(physics);
 
