@@ -1,4 +1,5 @@
 ﻿using mgtest.Abstracts;
+using mgtest.Config;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -12,7 +13,7 @@ public class GameOver(Game1 game) : Scene(game) {
 
     _elapsedTime += gameTime.ElapsedGameTime.TotalSeconds;
 
-    if (_elapsedTime >= 3) {
+    if (_elapsedTime >= Settings.DisplaySecs) {
       Game.SceneManager.ChangeScene(new Title(Game));
       _elapsedTime = -1;
     }

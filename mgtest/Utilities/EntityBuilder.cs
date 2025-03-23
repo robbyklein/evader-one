@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using mgtest.Entities;
 using mgtest.Managers;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using MonoGame.Extended.Tiled;
 
 namespace mgtest.Utilities;
@@ -13,7 +11,7 @@ public static class EntityBuilder {
     TiledMapObjectLayer layer,
     List<Entity> entities,
     ref Entity playerEntity,
-    ContentManager content,
+    Game1 game,
     TilemapManager tilemapManager,
     SfxManager sfxManager,
     InputManager inputManager
@@ -28,18 +26,18 @@ public static class EntityBuilder {
       else if (obj.Properties.ContainsKey("type")) {
         objType = obj.Properties["type"].ToString().ToLower();
       }
-      
+
       // Create object position
       var position = new Vector2(obj.Position.X, obj.Position.Y - obj.Size.Height);
 
       switch (objType) {
         case "player":
-          playerEntity = new PlayerEntity(content, tilemapManager, sfxManager, inputManager);
+          playerEntity = new PlayerEntity(game, tilemapManager, sfxManager, inputManager);
           playerEntity.Position = position;
           entities.Add(playerEntity);
           break;
         case "coin":
-          var coin = new CoinEntity(content);
+          var coin = new CoinEntity(game.Content);
           coin.Position = position;
           entities.Add(coin);
           break;

@@ -3,11 +3,12 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 public class BitmapFont {
-  // Hard-coded settings for your single font
   private const int TileWidth = 8;
   private const int TileHeight = 8;
-  private const int Columns = 12;
-  private static readonly string FontChars = " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.,:?!xxx()&#+-";
+  private const int Columns = 8;
+
+  // Update this if your new font has different supported characters
+  private static readonly string FontChars = "0123456789CWHPT _-/abcdefghijklmnopqrstuvwxyz:+!";
 
   private readonly Texture2D _texture;
   private readonly Dictionary<char, int> _charMap = new();
@@ -15,7 +16,6 @@ public class BitmapFont {
   public BitmapFont(Texture2D texture) {
     _texture = texture;
 
-    // Build the character map based on FontChars
     for (var i = 0; i < FontChars.Length; i++) {
       _charMap[FontChars[i]] = i;
     }
@@ -39,8 +39,12 @@ public class BitmapFont {
         spriteBatch.Draw(_texture, pos, sourceRect, color);
       }
 
-      // Move to the next character horizontally
       pos.X += TileWidth;
     }
+  }
+
+  public void DrawPaddedNumber(SpriteBatch spriteBatch, int number, int totalDigits, Vector2 position, Color color) {
+    string padded = number.ToString().PadLeft(totalDigits, '0');
+    DrawString(spriteBatch, padded, position, color);
   }
 }

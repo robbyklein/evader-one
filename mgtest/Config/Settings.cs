@@ -7,4 +7,5 @@ public static class Settings {
   public static int TileSize = 8;
   public static int Columns = 40;
   public static int Rows = 23;
+  public static int DisplaySecs = 3;
 }

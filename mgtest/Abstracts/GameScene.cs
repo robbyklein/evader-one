@@ -27,7 +27,7 @@ public abstract class GameScene(Game1 game) : Scene(game) {
       entityLayer,
       Entities,
       ref Player,
-      Game.Content,
+      Game,
       TilemapManager,
       SfxManager,
       InputManager

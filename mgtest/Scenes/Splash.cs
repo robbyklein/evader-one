@@ -1,4 +1,5 @@
 ﻿using mgtest.Abstracts;
+using mgtest.Config;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
@@ -38,7 +39,7 @@ public class Splash : Scene {
     }
 
     // Transition to the Title scene after a set display time.
-    if (_displayedTime > 3000) {
+    if (_displayedTime > Settings.DisplaySecs) {
       Game.SceneManager.ChangeScene(new Title(Game));
     }
 

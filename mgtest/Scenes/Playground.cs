@@ -11,7 +11,7 @@ public class Playground : LevelScene {
   private const float FadeDuration = 5.0f;
   private const float TargetVolume = 1.0f;
 
-  public Playground(Game1 game) : base(game, "1-1") {
+  public Playground(Game1 game, string levelString) : base(game, levelString) {
     MediaPlayer.IsRepeating = true;
   }
 

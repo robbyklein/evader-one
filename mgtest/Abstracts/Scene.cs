@@ -13,7 +13,7 @@ public abstract class Scene {
   protected readonly InputManager InputManager;
   protected Camera Camera;
   protected Song BackgroundSong;
-  protected BitmapFont BitmapFont;
+  public BitmapFont BitmapFont;
   protected TilemapManager TilemapManager;
 
   public Scene(Game1 game) {
@@ -28,7 +28,7 @@ public abstract class Scene {
   public virtual void LoadContent() {
     SfxManager.LoadSounds(Game);
 
-    var fontTexture = Game.Content.Load<Texture2D>("sprites/characters");
+    var fontTexture = Game.Content.Load<Texture2D>("sprites/hud");
     BitmapFont = new BitmapFont(fontTexture);
   }
 

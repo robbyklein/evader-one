@@ -48,7 +48,7 @@ public class Difficulty(Game1 game) : Scene(game) {
     if (InputManager.IsActionPressed(InputAction.Start)) {
       SfxManager.PlaySound(Sfx.Collect);
       GameData.Reset(_selectedDifficulty);
-      Game.SceneManager.ChangeScene(new LevelDisplay(Game));
+      Game.SceneManager.ChangeScene(new LevelDisplay(Game, GameData.CurrentLevel));
     }
 
     if (InputManager.IsActionPressed(InputAction.MoveUp)) {
@@ -66,9 +66,9 @@ public class Difficulty(Game1 game) : Scene(game) {
 
 
     spriteBatch.Begin();
-    BitmapFont.DrawString(spriteBatch, "EASY", new Vector2(114, 76), GetColorForDifficulty("Easy"));
-    BitmapFont.DrawString(spriteBatch, "NORMAL", new Vector2(114, 86), GetColorForDifficulty("Normal"));
-    BitmapFont.DrawString(spriteBatch, "HARD", new Vector2(114, 96), GetColorForDifficulty("Hard"));
+    BitmapFont.DrawString(spriteBatch, "easy", new Vector2(114, 76), GetColorForDifficulty("Easy"));
+    BitmapFont.DrawString(spriteBatch, "normal", new Vector2(114, 86), GetColorForDifficulty("Normal"));
+    BitmapFont.DrawString(spriteBatch, "hard", new Vector2(114, 96), GetColorForDifficulty("Hard"));
     spriteBatch.End();
   }
 }

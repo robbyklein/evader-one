@@ -4,7 +4,6 @@ using mgtest.Managers;
 using mgtest.Types;
 using mgtest.Utilities;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace mgtest.Entities;
@@ -38,14 +37,14 @@ public class PlayerEntity : Entity {
     }
   };
 
-  public PlayerEntity(ContentManager content, TilemapManager tilemapManager, SfxManager sfxManager,
+  public PlayerEntity(Game1 game, TilemapManager tilemapManager, SfxManager sfxManager,
     InputManager inputManager) {
     Position = new Vector2(50f, 20f);
 
     var spriteSheet = new SpriteSheet {
       Rows = 48,
       Columns = 14,
-      Texture = content.Load<Texture2D>("sprites/player")
+      Texture = game.Content.Load<Texture2D>("sprites/player")
     };
 
     // Initialize Components:
@@ -54,6 +53,7 @@ public class PlayerEntity : Entity {
 
     // Add the Physics
     var physics = new Physics(this,
+      game,
       sfxManager,
       tilemapManager.CollisionRectangles,
       tilemapManager.WaterRectangles,

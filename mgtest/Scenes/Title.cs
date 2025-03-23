@@ -59,7 +59,7 @@ public class Title : GameScene {
     // Draw title-specific UI on top (blinking "PRESS START!").
     spriteBatch.Begin(transformMatrix: Camera.Transform);
     if (_showPressStart) {
-      BitmapFont.DrawString(spriteBatch, "PRESS START!", new Vector2(114, 76), Color.White);
+      BitmapFont.DrawString(spriteBatch, "press start!", new Vector2(114, 76), Color.White);
     }
 
     spriteBatch.End();

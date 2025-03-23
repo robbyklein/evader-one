@@ -53,7 +53,7 @@ public class LevelScene(Game1 game, string levelString) : GameScene(game) {
         GameData.Lifes--;
 
         if (GameData.Lifes > 0) {
-          Game.SceneManager.ChangeScene(new Playground(Game));
+          Game.SceneManager.ChangeScene(new Playground(Game, GameData.CurrentLevel));
         }
         else {
           Game.SceneManager.ChangeScene(new GameOver(Game));

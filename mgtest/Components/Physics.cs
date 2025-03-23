@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using mgtest.Data;
 using mgtest.Entities;
 using mgtest.Interfaces;
+using mgtest.Scenes;
 using mgtest.Types;
 using mgtest.Utilities;
 using Microsoft.Xna.Framework;
@@ -37,24 +38,27 @@ public class Physics : IPhysics {
   public bool IsFacingRight { get; private set; } = true;
   public bool IsGrounded { get; private set; }
 
-  private readonly Entity owner;
-  private readonly SfxManager sfxManager;
-  private readonly List<RectangleF> collisionRects;
-  private readonly List<RectangleF> waterRects;
-  private readonly List<RectangleF> noWallRects;
-  private readonly Collider collider;
-  private readonly RectangleF finishRect;
+  private readonly Entity _owner;
+  private readonly SfxManager _sfxManager;
+  private readonly Game1 _game;
+  private readonly List<RectangleF> _collisionRects;
+  private readonly List<RectangleF> _waterRects;
+  private readonly List<RectangleF> _noWallRects;
+  private readonly Collider _collider;
+  private readonly RectangleF _finishRect;
 
   // Updated constructor now includes noWallRects.
-  public Physics(Entity owner, SfxManager sfxManager, List<RectangleF> collisionRects, List<RectangleF> waterRects,
+  public Physics(Entity owner, Game1 game, SfxManager sfxManager, List<RectangleF> collisionRects,
+    List<RectangleF> waterRects,
     List<RectangleF> noWallRects, Collider collider, RectangleF finishRect) {
-    this.owner = owner;
-    this.sfxManager = sfxManager;
-    this.collisionRects = collisionRects;
-    this.waterRects = waterRects;
-    this.noWallRects = noWallRects;
-    this.collider = collider;
-    this.finishRect = finishRect;
+    _owner = owner;
+    _sfxManager = sfxManager;
+    _collisionRects = collisionRects;
+    _waterRects = waterRects;
+    _noWallRects = noWallRects;
+    _collider = collider;
+    _finishRect = finishRect;
+    _game = game;
   }
 
   // Lifecycle
@@ -72,7 +76,8 @@ public class Physics : IPhysics {
 
   public void CheckFinish() {
     if (IsInFinish()) {
-      GameData.GameFinished = true;
+      GameData.NextLevel();
+      _game.SceneManager.ChangeScene(new LevelDisplay(_game, GameData.CurrentLevel));
     }
   }
 
@@ -138,7 +143,7 @@ public class Physics : IPhysics {
 
   private void Jump() {
     _velocity.Y = -JumpForce;
-    sfxManager.PlaySound(Sfx.Jump);
+    _sfxManager.PlaySound(Sfx.Jump);
   }
 
   private void ApplyMovement(float dt) {
@@ -154,8 +159,8 @@ public class Physics : IPhysics {
       return;
     }
 
-    Vector2 leftCheckPos = owner.Position + new Vector2(-1, 0);
-    Vector2 rightCheckPos = owner.Position + new Vector2(1, 0);
+    Vector2 leftCheckPos = _owner.Position + new Vector2(-1, 0);
+    Vector2 rightCheckPos = _owner.Position + new Vector2(1, 0);
 
     // Use the filtered collision check for wall detection.
     if (IsCollidingForWallCheck(leftCheckPos)) {
@@ -168,10 +173,10 @@ public class Physics : IPhysics {
   }
 
   private void UpdateGrounded() {
-    RectangleF nextPosition = collider.GetProjectedBounds(owner.Position + new Vector2(0, 1));
+    RectangleF nextPosition = _collider.GetProjectedBounds(_owner.Position + new Vector2(0, 1));
     IsGrounded = false;
 
-    foreach (RectangleF rect in collisionRects) {
+    foreach (RectangleF rect in _collisionRects) {
       if (nextPosition.Intersects(rect)) {
         IsGrounded = true;
         break;
@@ -192,7 +197,7 @@ public class Physics : IPhysics {
 
     _velocity.Y = -JumpForce;
     IsGrounded = false;
-    sfxManager.PlaySound(Sfx.Jump);
+    _sfxManager.PlaySound(Sfx.Jump);
   }
 
   private void MoveX(float distance) {
@@ -204,13 +209,13 @@ public class Physics : IPhysics {
       int sign = Math.Sign(move);
 
       while (move != 0) {
-        var nextPos = new Vector2(owner.Position.X + sign, owner.Position.Y);
+        var nextPos = new Vector2(_owner.Position.X + sign, _owner.Position.Y);
         if (IsColliding(nextPos)) {
           _velocity.X = 0;
           break;
         }
 
-        owner.Position.X += sign;
+        _owner.Position.X += sign;
         move -= sign;
       }
     }
@@ -225,7 +230,7 @@ public class Physics : IPhysics {
       int sign = Math.Sign(move);
 
       while (move != 0) {
-        var nextPos = new Vector2(owner.Position.X, owner.Position.Y + sign);
+        var nextPos = new Vector2(_owner.Position.X, _owner.Position.Y + sign);
         if (IsColliding(nextPos)) {
           if (sign > 0) {
             IsGrounded = true;
@@ -235,7 +240,7 @@ public class Physics : IPhysics {
           break;
         }
 
-        owner.Position.Y += sign;
+        _owner.Position.Y += sign;
         move -= sign;
       }
     }
@@ -256,8 +261,8 @@ public class Physics : IPhysics {
 
   // Standard collision check for general movement (uses all collision rectangles).
   private bool IsColliding(Vector2 newPosition) {
-    RectangleF nextPosition = collider.GetProjectedBounds(newPosition);
-    foreach (RectangleF rect in collisionRects) {
+    RectangleF nextPosition = _collider.GetProjectedBounds(newPosition);
+    foreach (RectangleF rect in _collisionRects) {
       if (nextPosition.Intersects(rect)) {
         return true;
       }
@@ -268,10 +273,10 @@ public class Physics : IPhysics {
 
   // New: Collision check used for wall detection that ignores rectangles from the noWallRects list.
   private bool IsCollidingForWallCheck(Vector2 newPosition) {
-    RectangleF nextPosition = collider.GetProjectedBounds(newPosition);
-    foreach (RectangleF rect in collisionRects) {
+    RectangleF nextPosition = _collider.GetProjectedBounds(newPosition);
+    foreach (RectangleF rect in _collisionRects) {
       // Skip rectangles marked as "no walls"
-      if (noWallRects.Contains(rect)) {
+      if (_noWallRects.Contains(rect)) {
         continue;
       }
 
@@ -284,8 +289,8 @@ public class Physics : IPhysics {
   }
 
   private bool IsInWater() {
-    RectangleF playerRect = collider.Bounds;
-    foreach (RectangleF waterRect in waterRects) {
+    RectangleF playerRect = _collider.Bounds;
+    foreach (RectangleF waterRect in _waterRects) {
       if (playerRect.Intersects(waterRect)) {
         return true;
       }
@@ -295,9 +300,9 @@ public class Physics : IPhysics {
   }
 
   private bool IsInFinish() {
-    RectangleF playerRect = collider.Bounds;
+    RectangleF playerRect = _collider.Bounds;
 
-    if (playerRect.Intersects(finishRect)) {
+    if (playerRect.Intersects(_finishRect)) {
       return true;
     }
 
