@@ -3,6 +3,7 @@ using mgtest.Data;
 using mgtest.Types;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 
 namespace mgtest.Scenes;
 
@@ -41,21 +42,28 @@ public class Difficulty(Game1 game) : Scene(game) {
     return Color.White;
   }
 
+  public override void LoadContent() {
+    base.LoadContent();
+    MediaPlayer.Stop();
+  }
+
   public override void Update(GameTime gameTime) {
     // Process title-specific input.
     InputManager.Update(gameTime);
 
     if (InputManager.IsActionPressed(InputAction.Start)) {
-      SfxManager.PlaySound(Sfx.Collect);
+      SfxManager.PlaySound(Sfx.MenuSelect);
       GameData.Reset(_selectedDifficulty);
       Game.SceneManager.ChangeScene(new LevelDisplay(Game, GameData.CurrentLevel));
     }
 
     if (InputManager.IsActionPressed(InputAction.MoveUp)) {
+      SfxManager.PlaySound(Sfx.MenuChange);
       Previous();
     }
 
     if (InputManager.IsActionPressed(InputAction.MoveDown)) {
+      SfxManager.PlaySound(Sfx.MenuChange);
       Next();
     }
   }

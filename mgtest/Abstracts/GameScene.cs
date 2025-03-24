@@ -20,6 +20,7 @@ public abstract class GameScene(Game1 game) : Scene(game) {
   protected virtual void LoadContent(string mapAsset, string songAsset) {
     base.LoadContent();
     TilemapManager.LoadMap(mapAsset);
+
     BackgroundSong = Game.Content.Load<Song>(songAsset);
 
     TiledMapObjectLayer entityLayer = TilemapManager.GetLayer(MapLayer.Entities);
@@ -33,7 +34,6 @@ public abstract class GameScene(Game1 game) : Scene(game) {
       InputManager
     );
 
-    MediaPlayer.Volume = 0.0f;
     MediaPlayer.Play(BackgroundSong);
   }
 

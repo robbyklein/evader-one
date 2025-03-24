@@ -6,6 +6,7 @@ using mgtest.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 
 namespace mgtest;
 
@@ -23,6 +24,7 @@ public class Game1 : Game {
     IsMouseVisible = true;
     IsFixedTimeStep = true;
     TargetElapsedTime = TimeSpan.FromSeconds(1.0 / 60.0);
+    MediaPlayer.IsRepeating = true;
 
     // Setup graphics manager
     _graphics = new GraphicsDeviceManager(this);

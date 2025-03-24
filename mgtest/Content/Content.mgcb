@@ -54,6 +54,12 @@
 /processorParam:Quality=Best
 /build:music/title.mp3
 
+#begin sfx/collect_coin.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/collect_coin.wav
+
 #begin sfx/collect.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -71,6 +77,18 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sfx/jump.wav
+
+#begin sfx/menu_change.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/menu_change.wav
+
+#begin sfx/menu_select.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sfx/menu_select.wav
 
 #begin sprites/buildings.png
 /importer:TextureImporter

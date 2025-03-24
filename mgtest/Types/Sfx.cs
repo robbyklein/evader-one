@@ -3,5 +3,8 @@
 public enum Sfx {
   Jump,
   Collect,
-  Collect2
+  Collect2,
+  MenuChange,
+  MenuSelect,
+  CollectCoin
 }

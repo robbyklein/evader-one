@@ -39,7 +39,7 @@ public class Splash : Scene {
     }
 
     // Transition to the Title scene after a set display time.
-    if (_displayedTime > Settings.DisplaySecs) {
+    if (_displayedTime > Settings.DisplaySecs * 1000) {
       Game.SceneManager.ChangeScene(new Title(Game));
     }
 
