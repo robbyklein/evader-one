@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using mgtest.Abstracts;
 using mgtest.Components;
 using mgtest.Managers;
 using mgtest.Types;
@@ -38,7 +39,7 @@ public class PlayerEntity : Entity {
   };
 
   public PlayerEntity(Game1 game, TilemapManager tilemapManager, SfxManager sfxManager,
-    InputManager inputManager) {
+    InputManager inputManager, Scene scene) {
     Position = new Vector2(50f, 20f);
 
     var spriteSheet = new SpriteSheet {
@@ -53,7 +54,7 @@ public class PlayerEntity : Entity {
 
     // Add the Physics
     var physics = new Physics(this,
-      game,
+      scene,
       sfxManager,
       tilemapManager.CollisionRectangles,
       tilemapManager.WaterRectangles,

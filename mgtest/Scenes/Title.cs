@@ -37,6 +37,7 @@ public class Title : GameScene {
 
 
     if (InputManager.IsActionPressed(InputAction.Start)) {
+      SfxManager.PlaySound(Sfx.MenuSelect);
       Game.SceneManager.ChangeScene(new Difficulty(Game));
     }
 

@@ -3,17 +3,17 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx",
+    "activeFile": "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Hud.tsx",
     "expandedProjectPaths": [
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content",
-        "mgtest/Content/tilesets",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets",
         ".",
+        "C:/Users/hello/Developer/mgtest/mgtest",
         "mgtest/Content",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets",
+        "mgtest/Content/tilesets",
         "C:/Users/hello/Developer/mgtest/mgtest/obj",
-        "C:/Users/hello/Developer/mgtest",
-        "C:/Users/hello/Developer/mgtest/mgtest"
+        "C:/Users/hello/Developer/mgtest/mgtest/Content",
+        "C:/Users/hello/Developer/mgtest"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -23,7 +23,8 @@
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx": {
             "expandedObjectLayers": [
-                3
+                3,
+                2
             ],
             "scale": 5.5,
             "selectedLayer": 1,
@@ -57,7 +58,7 @@
             "scaleInEditor": 1
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Hud.tsx": {
-            "scaleInDock": 1,
+            "scaleInDock": 8,
             "scaleInEditor": 1
         },
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Items.tsx": {
@@ -127,9 +128,9 @@
     "project": "tiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Hud.tsx",
-        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Patterns-and-symbols.tsx",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/playground.tmx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Patterns-and-symbols.tsx",
+        "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Hud.tsx",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/levels/title.tmx",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Overworld.tsx",
         "C:/Users/hello/Developer/mgtest/mgtest/Content/tilesets/Characters.tsx",

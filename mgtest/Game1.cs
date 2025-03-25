@@ -37,7 +37,7 @@ public class Game1 : Game {
   protected override void Initialize() {
     _screenScaler = new ScreenScaler(_graphics, Settings.VirtualWidth, Settings.VirtualHeight);
     _windowManager = new WindowManager(Window, _graphics);
-    SceneManager = new SceneManager(new Splash(this), GraphicsDevice);
+    SceneManager = new SceneManager(new Difficulty(this), GraphicsDevice);
     _renderTarget = new RenderTarget2D(GraphicsDevice, Settings.VirtualWidth, Settings.VirtualHeight);
 
     base.Initialize();

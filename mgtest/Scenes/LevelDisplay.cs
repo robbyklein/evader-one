@@ -3,6 +3,7 @@ using mgtest.Config;
 using mgtest.Data;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 
 namespace mgtest.Scenes;
 
@@ -20,6 +21,11 @@ public class LevelDisplay(Game1 game, string levelString) : Scene(game) {
     }
   }
 
+  public override void LoadContent() {
+    base.LoadContent();
+    MediaPlayer.Stop();
+  }
+
   public override void Draw(SpriteBatch spriteBatch) {
     base.Draw(spriteBatch);
 
@@ -32,7 +38,7 @@ public class LevelDisplay(Game1 game, string levelString) : Scene(game) {
     BitmapFont.DrawString(spriteBatch, "+pass:", new Vector2(left, top + 32 + 16), Color.White);
     BitmapFont.DrawString(spriteBatch, $"C{levelData.Coins}", new Vector2(left, top + 48 + 16), Color.White);
     BitmapFont.DrawString(spriteBatch, $"P{levelData.ScoreThreshold}", new Vector2(left, top + 64 + 16), Color.White);
-    BitmapFont.DrawString(spriteBatch, $"T{levelData.Coins}", new Vector2(left, top + 80 + 16), Color.White);
+    BitmapFont.DrawString(spriteBatch, $"T{levelData.Time}", new Vector2(left, top + 80 + 16), Color.White);
     spriteBatch.End();
   }
 }

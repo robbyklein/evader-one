@@ -10,17 +10,33 @@ public static class GameData {
 
   // Global state
   public static bool GameStarted = true;
-  public static bool GameFinished = false;
+  public static bool GameFinished;
   public static int Points;
   public static int Lifes = 3;
   public static int Coins;
+  public static int TotalCoins;
+  public static int TotalPoints;
   public static GameDifficulty Difficulty = GameDifficulty.Normal;
 
   public static string CurrentLevel => Levels[_currentLevel];
 
   public static void NextLevel() {
+    TotalCoins += Coins;
+    TotalPoints += Points;
+    Coins = 0;
+    Points = 0;
+
     GameStarted = false;
+    GameFinished = false;
     _currentLevel++;
+  }
+
+  public static void Fail() {
+    Coins = 0;
+    Points = 0;
+    Lifes--;
+    GameStarted = false;
+    GameFinished = false;
   }
 
   public static void Reset(GameDifficulty difficulty) {
@@ -28,6 +44,8 @@ public static class GameData {
     Points = 0;
     Lifes = 3;
     Coins = 0;
+    GameStarted = false;
+    GameFinished = false;
     _currentLevel = 0;
   }
 }

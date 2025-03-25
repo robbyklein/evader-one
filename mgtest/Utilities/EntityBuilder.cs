@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using mgtest.Abstracts;
 using mgtest.Entities;
 using mgtest.Managers;
 using Microsoft.Xna.Framework;
@@ -14,7 +15,8 @@ public static class EntityBuilder {
     Game1 game,
     TilemapManager tilemapManager,
     SfxManager sfxManager,
-    InputManager inputManager
+    InputManager inputManager,
+    Scene scene
   ) {
     foreach (TiledMapObject obj in layer.Objects) {
       // Get the object type
@@ -32,7 +34,7 @@ public static class EntityBuilder {
 
       switch (objType) {
         case "player":
-          playerEntity = new PlayerEntity(game, tilemapManager, sfxManager, inputManager);
+          playerEntity = new PlayerEntity(game, tilemapManager, sfxManager, inputManager, scene);
           playerEntity.Position = position;
           entities.Add(playerEntity);
           break;

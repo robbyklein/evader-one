@@ -30,16 +30,16 @@ public static class LevelData {
     ["1-1"] = new LevelDetails {
       SongAsset = "music/one",
       Tilemap = "levels/playground",
-      Easy = new LevelRequirements { Coins = 5, Time = 200, ScoreThreshold = 1000 },
-      Normal = new LevelRequirements { Coins = 5, Time = 30, ScoreThreshold = 0 },
-      Hard = new LevelRequirements { Coins = 20, Time = 150, ScoreThreshold = 2000 }
+      Easy = new LevelRequirements { Coins = 2, Time = 13, ScoreThreshold = 0 },
+      Normal = new LevelRequirements { Coins = 2, Time = 10, ScoreThreshold = 0 },
+      Hard = new LevelRequirements { Coins = 2, Time = 6, ScoreThreshold = 0 }
     },
     ["1-2"] = new LevelDetails {
       SongAsset = "music/one",
       Tilemap = "levels/playground",
-      Easy = new LevelRequirements { Coins = 12, Time = 220, ScoreThreshold = 1100 },
-      Normal = new LevelRequirements { Coins = 18, Time = 190, ScoreThreshold = 1600 },
-      Hard = new LevelRequirements { Coins = 25, Time = 140, ScoreThreshold = 2100 }
+      Easy = new LevelRequirements { Coins = 12, Time = 3, ScoreThreshold = 1100 },
+      Normal = new LevelRequirements { Coins = 18, Time = 3, ScoreThreshold = 1600 },
+      Hard = new LevelRequirements { Coins = 25, Time = 3, ScoreThreshold = 2100 }
     }
   };
 

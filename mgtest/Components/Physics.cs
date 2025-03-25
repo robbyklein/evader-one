@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using mgtest.Data;
+using mgtest.Abstracts;
 using mgtest.Entities;
 using mgtest.Interfaces;
-using mgtest.Scenes;
 using mgtest.Types;
 using mgtest.Utilities;
 using Microsoft.Xna.Framework;
@@ -40,7 +39,7 @@ public class Physics : IPhysics {
 
   private readonly Entity _owner;
   private readonly SfxManager _sfxManager;
-  private readonly Game1 _game;
+  private readonly Scene _scene;
   private readonly List<RectangleF> _collisionRects;
   private readonly List<RectangleF> _waterRects;
   private readonly List<RectangleF> _noWallRects;
@@ -48,7 +47,7 @@ public class Physics : IPhysics {
   private readonly RectangleF _finishRect;
 
   // Updated constructor now includes noWallRects.
-  public Physics(Entity owner, Game1 game, SfxManager sfxManager, List<RectangleF> collisionRects,
+  public Physics(Entity owner, Scene scene, SfxManager sfxManager, List<RectangleF> collisionRects,
     List<RectangleF> waterRects,
     List<RectangleF> noWallRects, Collider collider, RectangleF finishRect) {
     _owner = owner;
@@ -58,7 +57,7 @@ public class Physics : IPhysics {
     _noWallRects = noWallRects;
     _collider = collider;
     _finishRect = finishRect;
-    _game = game;
+    _scene = scene;
   }
 
   // Lifecycle
@@ -76,8 +75,11 @@ public class Physics : IPhysics {
 
   public void CheckFinish() {
     if (IsInFinish()) {
-      GameData.NextLevel();
-      _game.SceneManager.ChangeScene(new LevelDisplay(_game, GameData.CurrentLevel));
+      var levelScene = _scene as LevelScene;
+
+      if (levelScene != null) {
+        levelScene.EndRoutine();
+      }
     }
   }
 

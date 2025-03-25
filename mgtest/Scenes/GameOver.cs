@@ -23,7 +23,7 @@ public class GameOver(Game1 game) : Scene(game) {
     base.Draw(spriteBatch);
 
     spriteBatch.Begin();
-    BitmapFont.DrawString(spriteBatch, "GAME OVER", new Vector2(114, 76), Color.White);
+    BitmapFont.DrawString(spriteBatch, "game over", new Vector2(114, 76), Color.White);
     spriteBatch.End();
   }
 }

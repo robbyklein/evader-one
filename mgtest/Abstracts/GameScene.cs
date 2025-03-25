@@ -31,7 +31,8 @@ public abstract class GameScene(Game1 game) : Scene(game) {
       Game,
       TilemapManager,
       SfxManager,
-      InputManager
+      InputManager,
+      this
     );
 
     MediaPlayer.Play(BackgroundSong);
